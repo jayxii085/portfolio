@@ -1,0 +1,3246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minsopanha · Aspiring Web Developer · RUPP</title>
+  <meta name="description" content="Beginner web developer studying at RUPP. Learning HTML, CSS, and JavaScript — building projects one step at a time.">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Kantumruy+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============ RESET ============ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ============================================================
+       THEME VARIABLES — LIGHT MODE
+       ============================================================ */
+    :root,
+    html.light {
+      --bg: #f0fdf4;
+      --card: rgba(255, 255, 255, 0.78);
+      --card-solid: #ffffff;
+      --text: #052e16;
+      --muted: #4b5563;
+      --border: rgba(16, 185, 129, 0.15);
+      --brand: #059669;
+      --brand-deep: #047857;
+      --accent: #10b981;
+      --lime: #84cc16;
+      --shadow-sm: 0 4px 12px -4px rgba(16, 185, 129, 0.14);
+      --shadow-md: 0 12px 32px -8px rgba(16, 185, 129, 0.2);
+      --shadow-lg: 0 24px 48px -16px rgba(16, 185, 129, 0.35);
+      --header-bg: rgba(240, 253, 244, 0.75);
+      --bg-grad-1: #d1fae5;
+      --bg-grad-2: #ecfccb;
+      --bg-grad-3: #a7f3d0;
+      --bg-grad-4: #bbf7d0;
+      --glow-color: rgba(255, 255, 255, 0.5);
+      --grid-color: rgba(16, 185, 129, 0.05);
+      --tag-bg: rgba(255, 255, 255, 0.6);
+      --code-bg: rgba(16, 185, 129, 0.08);
+    }
+
+    html.dark {
+      --bg: #021410;
+      --card: rgba(6, 30, 22, 0.72);
+      --card-solid: #0a1f19;
+      --text: #ecfdf5;
+      --muted: #6ee7b7;
+      --border: rgba(52, 211, 153, 0.15);
+      --brand: #10b981;
+      --brand-deep: #059669;
+      --accent: #34d399;
+      --lime: #a3e635;
+      --shadow-sm: 0 4px 12px -4px rgba(16, 185, 129, 0.3);
+      --shadow-md: 0 12px 32px -8px rgba(16, 185, 129, 0.4);
+      --shadow-lg: 0 24px 48px -16px rgba(16, 185, 129, 0.5);
+      --header-bg: rgba(2, 20, 16, 0.78);
+      --bg-grad-1: rgba(16, 185, 129, 0.42);
+      --bg-grad-2: rgba(132, 204, 22, 0.28);
+      --bg-grad-3: rgba(5, 150, 105, 0.35);
+      --bg-grad-4: rgba(52, 211, 153, 0.3);
+      --glow-color: rgba(52, 211, 153, 0.35);
+      --grid-color: rgba(52, 211, 153, 0.06);
+      --tag-bg: rgba(255, 255, 255, 0.05);
+      --code-bg: rgba(52, 211, 153, 0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', 'Kantumruy Pro', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background 0.4s, color 0.4s;
+      position: relative;
+      cursor: none;
+    }
+
+    .kh {
+      font-family: 'Kantumruy Pro', 'Inter', sans-serif;
+      font-weight: 500;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1024px) {
+      body { cursor: auto; }
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* =====================================================
+       PAGE LOADER
+       ===================================================== */
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease, visibility 0.6s;
+    }
+    .loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .loader-dots { display: flex; gap: 8px; }
+    .loader-dot {
+      width: 12px; height: 12px;
+      background: var(--brand); border-radius: 50%;
+      animation: bounceDot 0.6s ease-in-out infinite;
+    }
+    .loader-dot:nth-child(2) { animation-delay: 0.1s; background: var(--accent); }
+    .loader-dot:nth-child(3) { animation-delay: 0.2s; background: var(--lime); }
+    @keyframes bounceDot {
+      0%, 100% { transform: translateY(0); opacity: 0.6; }
+      50%      { transform: translateY(-12px); opacity: 1; }
+    }
+    .loader-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 0.2em; text-transform: uppercase;
+    }
+
+    /* =====================================================
+       CURSOR DOT
+       ===================================================== */
+    .cursor-dot {
+      position: fixed; top: 0; left: 0;
+      width: 10px; height: 10px;
+      background: var(--brand); border-radius: 50%;
+      pointer-events: none; z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      will-change: left, top;
+    }
+    .cursor-dot.hover { width: 22px; height: 22px; background: var(--lime); }
+    @media (max-width: 1024px), (hover: none) {
+      .cursor-dot { display: none; }
+      body { cursor: auto; }
+    }
+
+    /* =====================================================
+       BACKGROUND
+       ===================================================== */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: -1;
+      overflow: hidden; pointer-events: none;
+      background: linear-gradient(120deg,
+        var(--bg-grad-1) 0%, var(--bg-grad-2) 20%,
+        var(--bg-grad-3) 40%, var(--bg-grad-4) 60%,
+        var(--bg-grad-1) 80%, var(--bg-grad-2) 100%);
+      background-size: 400% 400%;
+      animation: gradientRun 20s ease infinite;
+      transition: background 0.5s;
+    }
+    @keyframes gradientRun {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .bg-glow {
+      position: absolute; top: 50%; left: 50%;
+      width: 900px; height: 900px; border-radius: 50%;
+      background: radial-gradient(circle, var(--glow-color) 0%, transparent 60%);
+      transform: translate(-50%, -50%);
+      filter: blur(80px);
+      animation: glowPulse 8s ease-in-out infinite;
+      pointer-events: none;
+      transition: background 0.5s;
+    }
+    @keyframes glowPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+      50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
+
+    .bg-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    }
+
+    .sparkle {
+      position: absolute; width: 4px; height: 4px;
+      background: var(--lime); border-radius: 50%;
+      box-shadow: 0 0 6px var(--lime);
+      animation: sparkle 6s ease-in-out infinite; opacity: 0;
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50%      { opacity: 1; transform: scale(1.2); }
+    }
+
+    .header, main, .footer { position: relative; z-index: 1; }
+
+    /* ============ SCROLL PROGRESS ============ */
+    .scroll-progress {
+      position: fixed; top: 0; left: 0;
+      height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--brand), var(--lime));
+      z-index: 9999; transition: width 0.1s;
+    }
+
+    /* ============ LAYOUT ============ */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* ============ HEADER ============ */
+    .header {
+      position: fixed; top: 16px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: min(94%, 1100px);
+      background: var(--header-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1), background 0.4s;
+      box-shadow: 0 8px 32px -12px rgba(16, 185, 129, 0.15);
+    }
+    .header.scrolled { top: 8px; box-shadow: 0 16px 40px -12px rgba(16, 185, 129, 0.3); }
+    .header-inner {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 20px; transition: padding 0.4s;
+    }
+    .header.scrolled .header-inner { padding: 8px 20px; }
+
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--brand), var(--lime));
+      color: #fff; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 6px 16px -4px rgba(16, 185, 129, 0.5);
+    }
+    .logo:hover .logo-mark { transform: rotate(-8deg) scale(1.08); }
+    .logo-name { font-weight: 700; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .logo-name span { color: var(--brand); }
+    .logo-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.1em; }
+
+    .nav-desktop { display: flex; gap: 4px; }
+    .nav-link {
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      padding: 8px 14px; border-radius: 999px;
+      transition: all 0.3s;
+      display: flex; flex-direction: column; align-items: center;
+      line-height: 1.1;
+    }
+    .nav-link .en { font-size: 12px; }
+    .nav-link .km { font-size: 10px; opacity: 0.75; font-family: 'Kantumruy Pro', sans-serif; }
+    .nav-link:hover { color: var(--brand); background: rgba(16, 185, 129, 0.08); }
+    .nav-link.active { color: #fff; background: var(--brand); }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+
+    .live-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--muted);
+      padding: 6px 12px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 999px;
+      display: none;
+    }
+    @media (min-width: 1200px) { .live-time { display: inline-block; } }
+
+    /* ============ COMMAND TRIGGER (v10) ============ */
+    .cmd-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .cmd-trigger:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+      transform: translateY(-2px);
+    }
+    .cmd-trigger .kbd {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: var(--code-bg);
+      border-radius: 5px;
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 1100px) { .cmd-trigger { display: none; } }
+
+    .theme-toggle {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .theme-toggle:hover {
+      background: var(--brand); color: #fff;
+      border-color: var(--brand);
+      transform: rotate(20deg) scale(1.05);
+    }
+    .theme-toggle i { font-size: 13px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 600;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.3s, background 0.25s, color 0.25s;
+      border: none; cursor: pointer;
+    }
+    .btn-dark { background: var(--text); color: var(--bg); }
+    .btn-dark:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px -12px rgba(16, 185, 129, 0.6);
+      background: var(--brand);
+    }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover {
+      background: var(--card-solid);
+      border-color: var(--brand);
+      color: var(--brand);
+      transform: translateY(-3px);
+    }
+
+    .btn-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s;
+      color: var(--text);
+    }
+    .btn-icon:hover { background: var(--brand); color: #fff; }
+
+    @media (max-width: 900px) {
+      .nav-desktop, .header-actions .btn { display: none; }
+      .btn-icon { display: flex; }
+    }
+
+    .mobile-menu {
+      border-top: 1px solid var(--border);
+      padding: 12px 16px 16px;
+      display: flex; flex-direction: column; gap: 4px;
+      background: var(--card-solid);
+      border-radius: 0 0 20px 20px;
+    }
+    .mobile-menu.hidden { display: none; }
+    .mobile-link {
+      padding: 10px 12px; border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      color: var(--muted); transition: all 0.25s;
+      display: flex; flex-direction: column;
+    }
+    .mobile-link .en { font-size: 14px; }
+    .mobile-link .km { font-size: 12px; opacity: 0.75; font-family: 'Kantumruy Pro', sans-serif; }
+    .mobile-link:hover { background: rgba(16, 185, 129, 0.08); color: var(--brand); }
+    .mobile-mail {
+      background: linear-gradient(135deg, #ea4335, #fbbc04);
+      color: #fff; text-align: center; font-weight: 600;
+      margin-top: 8px;
+    }
+
+    /* ============ HERO ============ */
+    .hero { padding: 140px 0 80px; }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 60px; align-items: center;
+    }
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 999px;
+      font-size: 12px; color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s;
+    }
+    .hero-badge:hover { border-color: var(--brand); transform: translateY(-2px); }
+
+    .dot-green {
+      width: 6px; height: 6px;
+      background: #22c55e; border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(2.25rem, 5.5vw, 3.75rem);
+      font-weight: 800; line-height: 1.05;
+      letter-spacing: -0.02em; margin-bottom: 24px;
+    }
+    .hero-title .kh-line {
+      font-family: 'Kantumruy Pro', sans-serif;
+      font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+      font-weight: 500; letter-spacing: 0;
+      line-height: 1.5; display: block;
+      margin-top: 14px; color: var(--muted);
+    }
+    .accent { color: var(--brand); }
+
+    .hero-text {
+      font-size: 17px; color: var(--muted);
+      max-width: 560px; margin-bottom: 14px;
+    }
+    .hero-text strong { color: var(--text); font-weight: 600; }
+    .hero-text.kh { font-size: 15px; line-height: 1.8; }
+
+    .hero-typing {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px; color: var(--brand);
+      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 6px;
+      min-height: 22px;
+    }
+    .cursor-bar {
+      display: inline-block;
+      width: 2px; height: 18px;
+      background: var(--brand);
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    .hero-avatar-wrap {
+      display: flex; justify-content: center;
+      align-items: center; position: relative;
+    }
+    .hero-avatar {
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), var(--lime));
+      padding: 6px; position: relative;
+      box-shadow: 0 24px 48px -16px rgba(16, 185, 129, 0.4);
+      animation: floatAvatar 6s ease-in-out infinite;
+    }
+    @keyframes floatAvatar {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-12px); }
+    }
+    .hero-avatar::after {
+      content: '';
+      position: absolute; inset: -8px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--brand), var(--lime), var(--accent), var(--brand));
+      z-index: -1; opacity: 0.4; filter: blur(20px);
+      animation: rotateGlow 8s linear infinite;
+    }
+    @keyframes rotateGlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .hero-avatar-inner {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: var(--card-solid);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      border: 3px solid var(--bg);
+      overflow: hidden; position: relative;
+    }
+    .hero-avatar-initials {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 5rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--brand), var(--lime));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; line-height: 1;
+    }
+    .hero-avatar-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      margin-top: 8px; letter-spacing: 0.15em;
+      text-transform: uppercase; text-align: center;
+    }
+    .hero-avatar-label .kh {
+      display: block; font-size: 11px;
+      letter-spacing: 0; margin-top: 2px;
+      text-transform: none;
+    }
+
+    .hero-ring {
+      position: absolute; inset: -20px; border-radius: 50%;
+      border: 2px dashed rgba(16, 185, 129, 0.3);
+      animation: rotateRing 40s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rotateRing {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .hero-badge-float {
+      position: absolute; background: var(--card-solid);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 10px 14px; display: flex;
+      align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600;
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(12px); z-index: 2;
+      color: var(--text);
+    }
+    .hero-badge-float i { color: var(--brand); }
+    .hero-badge-1 { top: 10%; right: -10px; animation: float1 4s ease-in-out infinite; }
+    .hero-badge-2 { bottom: 10%; left: -20px; animation: float2 5s ease-in-out infinite; }
+    @keyframes float1 {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(8px); }
+    }
+
+    .wave-divider {
+      width: 100%; height: 40px;
+      margin: 40px 0; overflow: hidden;
+    }
+    .wave-divider svg { width: 100%; height: 100%; }
+
+    /* ============ QUICK STATS ============ */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin: 60px 0;
+    }
+    .stat-box {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 22px;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      position: relative; overflow: hidden;
+    }
+    .stat-box::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--brand), var(--lime));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .stat-box:hover::before { transform: scaleX(1); }
+    .stat-box:hover {
+      transform: translateY(-5px);
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: var(--shadow-md);
+    }
+    .stat-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(16,185,129,0.14); color: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; margin-bottom: 12px;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .stat-box:hover .stat-icon { transform: rotate(-10deg) scale(1.1); }
+    .stat-num {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 28px; font-weight: 800;
+      letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .stat-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .stat-lbl .kh {
+      display: block; font-size: 11px;
+      letter-spacing: 0; text-transform: none;
+      margin-top: 2px;
+    }
+
+    /* ============ SECTIONS ============ */
+    .section { padding: 90px 0; border-top: 1px solid var(--border); }
+    .section-head { margin-bottom: 52px; }
+    .section-label {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700; letter-spacing: -0.02em;
+    }
+    .section-title .kh {
+      display: block;
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+      font-weight: 500; letter-spacing: 0;
+      color: var(--muted); margin-top: 6px;
+    }
+    .section-sub { color: var(--muted); margin-top: 8px; font-size: 16px; }
+    .section-sub.kh { font-size: 15px; }
+
+    /* ============ MARQUEE ============ */
+    .marquee {
+      margin: 70px 0; overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 22px 0; position: relative;
+      mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+    }
+    .marquee-track {
+      display: flex; gap: 48px;
+      animation: marqueeScroll 40s linear infinite;
+      white-space: nowrap; width: max-content;
+    }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 600;
+      color: var(--muted); letter-spacing: 0.05em;
+    }
+    .marquee-item i { color: var(--brand); font-size: 14px; }
+    .marquee-item .kh {
+      font-family: 'Kantumruy Pro', sans-serif;
+      font-size: 12px; opacity: 0.75;
+    }
+    .marquee-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--lime); box-shadow: 0 0 6px var(--lime);
+    }
+
+    /* ============ PROJECTS ============ */
+    .filter-bar {
+      display: flex; flex-wrap: wrap;
+      gap: 8px; margin-bottom: 28px;
+    }
+    .filter-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; padding: 8px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px; color: var(--muted);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .filter-btn i { font-size: 11px; }
+    .filter-btn:hover {
+      color: var(--brand); border-color: var(--brand);
+      transform: translateY(-2px);
+    }
+    .filter-btn.active {
+      background: var(--brand); color: #fff;
+      border-color: var(--brand);
+      box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.5);
+    }
+    .filter-count {
+      font-size: 10px; opacity: 0.75;
+      background: rgba(255,255,255,0.15);
+      padding: 1px 6px; border-radius: 999px;
+    }
+    .filter-btn:not(.active) .filter-count {
+      background: rgba(16, 185, 129, 0.12); color: var(--brand);
+    }
+
+    .project-list {
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .project-h {
+      display: grid; grid-template-columns: 320px 1fr;
+      gap: 0; background: var(--card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 22px; overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      position: relative;
+      cursor: pointer;
+    }
+    .project-h.filtered-out { display: none; }
+    @media (max-width: 800px) {
+      .project-h { grid-template-columns: 1fr; }
+    }
+    .project-h:hover {
+      transform: translateY(-6px);
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: var(--shadow-lg);
+    }
+    .project-h-preview {
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(132,204,22,0.12));
+      padding: 20px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .project-h:hover .mock-window { transform: scale(1.03); }
+    .project-h .mock-window {
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      width: 100%;
+    }
+    .project-h-body {
+      padding: 28px; display: flex;
+      flex-direction: column; justify-content: center;
+      position: relative;
+    }
+    .project-h-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 700;
+      color: var(--brand); letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+    .project-h h3 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px; font-weight: 700;
+      margin-bottom: 4px; letter-spacing: -0.01em;
+    }
+    .project-h h3 .kh {
+      display: block; font-size: 16px;
+      font-weight: 500; color: var(--muted);
+      letter-spacing: 0;
+    }
+    .project-h p { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+    .project-h p.kh { font-size: 13.5px; line-height: 1.7; }
+    .project-h-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+    .project-h-tags span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; padding: 3px 9px;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px; color: var(--muted);
+      transition: all 0.25s;
+    }
+    .project-h:hover .project-h-tags span {
+      border-color: rgba(16,185,129,0.35);
+      color: var(--brand);
+    }
+    .project-h-link {
+      font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--brand); align-self: flex-start;
+      transition: gap 0.3s;
+    }
+    .project-h-link:hover { gap: 12px; }
+
+    .mock-window {
+      background: var(--card-solid);
+      border-radius: 10px; border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 8px 20px -8px rgba(0,0,0,0.15);
+      transition: background 0.4s;
+    }
+    .mock-bar {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 10px;
+      background: rgba(16, 185, 129, 0.08);
+      border-bottom: 1px solid var(--border);
+    }
+    .mock-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .mock-dot.red { background: #f87171; }
+    .mock-dot.yellow { background: #fbbf24; }
+    .mock-dot.green { background: #34d399; }
+    .mock-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px; color: var(--muted);
+      margin-left: 8px; opacity: 0.7;
+    }
+    .mock-body {
+      padding: 12px; display: flex;
+      flex-direction: column; gap: 6px;
+      min-height: 100px;
+    }
+    .mock-line { height: 6px; background: rgba(16, 185, 129, 0.2); border-radius: 3px; }
+    .mock-line.w-75 { width: 75%; }
+    .mock-line.w-50 { width: 50%; }
+    .mock-line.w-90 { width: 90%; }
+    .mock-line.w-60 { width: 60%; }
+    .mock-block {
+      flex: 1; background: rgba(16, 185, 129, 0.1);
+      border-radius: 6px; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--brand); opacity: 0.7;
+      font-size: 22px; padding: 8px;
+    }
+
+    .projects-note {
+      margin-top: 28px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      font-size: 14px; color: var(--muted);
+    }
+    .projects-note i { color: var(--brand); }
+    .projects-note .kh { font-size: 13.5px; }
+
+    /* ============ PROJECT MODAL (v10 NEW) ============ */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0; visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .modal-backdrop.open { opacity: 1; visibility: visible; }
+    .modal {
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      max-width: 640px; width: 100%;
+      max-height: 85vh; overflow-y: auto;
+      padding: 32px;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-backdrop.open .modal { transform: scale(1) translateY(0); }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.25s;
+      font-size: 12px;
+    }
+    .modal-close:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #fff;
+      transform: rotate(90deg);
+    }
+    .modal-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 700;
+      color: var(--brand); letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+    .modal-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 28px; font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .modal-title-kh {
+      font-family: 'Kantumruy Pro', sans-serif;
+      font-size: 16px; color: var(--muted);
+      font-weight: 500; margin-bottom: 20px;
+    }
+    .modal-preview {
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(132,204,22,0.12));
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-preview .mock-window { width: 100%; max-width: 340px; }
+    .modal-section-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      margin-top: 20px;
+    }
+    .modal-desc {
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .modal-desc.kh {
+      font-family: 'Kantumruy Pro', sans-serif;
+      font-size: 14px;
+      line-height: 1.85;
+    }
+    .modal-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .modal-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .modal-features li i {
+      color: var(--brand);
+      font-size: 12px;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .modal-tags {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-top: 12px;
+    }
+    .modal-tags span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; padding: 4px 10px;
+      background: var(--code-bg);
+      border-radius: 6px;
+      color: var(--brand);
+      font-weight: 600;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ============ ABOUT ============ */
+    .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; }
+    @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; gap: 32px; } }
+    .about-text .section-title { margin: 12px 0 24px; }
+    .about-text p { color: var(--muted); margin-bottom: 16px; font-size: 16px; }
+    .about-text p.kh { font-size: 15px; line-height: 1.85; }
+
+    .about-contact { margin-top: 32px; }
+    .mini-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.15em; color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .contact-line {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px; border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      position: relative;
+    }
+    .contact-line:hover {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      transform: translateX(6px);
+      box-shadow: var(--shadow-sm);
+    }
+    .contact-icon {
+      width: 42px; height: 42px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; flex-shrink: 0;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .contact-line:hover .contact-icon { transform: rotate(-8deg) scale(1.08); }
+    .contact-icon.mail { background: linear-gradient(135deg, #ea4335, #fbbc04); }
+    .contact-icon.tg { background: linear-gradient(135deg, #38bdf8, #3b82f6); }
+    .contact-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .contact-val { font-size: 14px; font-weight: 600; }
+
+    .copy-btn {
+      margin-left: auto;
+      width: 30px; height: 30px; border-radius: 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.25s;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover {
+      background: var(--brand); color: #fff;
+      border-color: var(--brand); transform: scale(1.08);
+    }
+    .copy-btn.copied {
+      background: #22c55e;
+      border-color: #22c55e; color: #fff;
+    }
+    .copy-btn i { font-size: 11px; }
+
+    .toast {
+      position: fixed; bottom: 90px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 20px; border-radius: 999px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      opacity: 0; visibility: hidden;
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 1000;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toast.show {
+      opacity: 1; visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast i { color: #22c55e; }
+
+    .about-side { display: flex; flex-direction: column; gap: 16px; }
+    .info-card {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      position: relative; overflow: hidden;
+    }
+    .info-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--brand), var(--lime));
+      transform: scaleX(0.4); transform-origin: left;
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .info-card:hover::before { transform: scaleX(1); }
+    .info-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(16,185,129,0.4);
+      box-shadow: var(--shadow-md);
+    }
+    .info-card:hover .info-icon { transform: rotate(-8deg) scale(1.1); }
+    .info-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(16,185,129,0.14); color: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px; font-size: 14px;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .info-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700;
+      color: var(--muted); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+    .info-value { font-size: 14px; font-weight: 600; }
+    .info-value .kh { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+
+    /* ============ TESTIMONIALS ============ */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; margin-top: 32px;
+    }
+    .testimonial {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      overflow: hidden;
+    }
+    .testimonial::before {
+      content: '"';
+      position: absolute; top: 8px; right: 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 80px; font-weight: 900;
+      color: var(--brand); opacity: 0.12; line-height: 1;
+    }
+    .testimonial:hover {
+      transform: translateY(-6px);
+      border-color: rgba(16,185,129,0.4);
+      box-shadow: var(--shadow-lg);
+    }
+    .testimonial-text {
+      font-size: 14.5px; color: var(--text);
+      line-height: 1.7; margin-bottom: 20px;
+      position: relative; z-index: 1;
+    }
+    .testimonial-text.kh {
+      font-size: 14px; line-height: 1.85;
+      color: var(--muted); margin-bottom: 20px;
+      font-family: 'Kantumruy Pro', sans-serif;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .testimonial-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), var(--lime));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800; font-size: 15px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      flex-shrink: 0;
+    }
+    .testimonial-name { font-size: 14px; font-weight: 700; }
+    .testimonial-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .testimonial-stars {
+      display: flex; gap: 2px; margin-left: auto;
+      color: #fbbf24; font-size: 11px;
+    }
+
+    /* ============ BLOG PREVIEW (v10 NEW) ============ */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; margin-top: 32px;
+    }
+    .blog-card {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      display: flex; flex-direction: column;
+    }
+    .blog-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(16,185,129,0.4);
+      box-shadow: var(--shadow-lg);
+    }
+    .blog-thumb {
+      height: 100px;
+      background: linear-gradient(135deg, var(--brand), var(--lime));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .blog-thumb::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 60%);
+    }
+    .blog-thumb i { position: relative; z-index: 1; }
+    .blog-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+    .blog-meta {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .blog-meta .dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--muted); opacity: 0.5;
+    }
+    .blog-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 17px; font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .blog-title .kh {
+      display: block;
+      font-size: 14px; font-weight: 500;
+      color: var(--muted); margin-top: 2px;
+    }
+    .blog-excerpt {
+      font-size: 13.5px; color: var(--muted);
+      line-height: 1.6; margin-bottom: 16px;
+      flex: 1;
+    }
+    .blog-link {
+      font-size: 12px; font-weight: 600;
+      color: var(--brand);
+      display: inline-flex; align-items: center; gap: 5px;
+      transition: gap 0.25s;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .blog-card:hover .blog-link { gap: 10px; }
+
+    /* ============ EDUCATION TIMELINE ============ */
+    .edu-timeline {
+      position: relative;
+      padding-left: 40px;
+      margin-top: 32px;
+    }
+    .edu-timeline::before {
+      content: '';
+      position: absolute;
+      left: 12px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--brand), var(--lime));
+      border-radius: 2px; opacity: 0.4;
+    }
+    .edu-item {
+      position: relative;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .edu-item:hover {
+      transform: translateX(6px);
+      border-color: rgba(16,185,129,0.4);
+      box-shadow: var(--shadow-lg);
+    }
+    .edu-item::before {
+      content: '';
+      position: absolute;
+      left: -34px; top: 32px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--brand);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+      transition: all 0.3s;
+    }
+    .edu-item:hover::before {
+      box-shadow: 0 0 0 6px rgba(16,185,129,0.25);
+      transform: scale(1.15);
+    }
+    .edu-item-head {
+      display: flex; align-items: flex-start;
+      gap: 20px; margin-bottom: 16px;
+    }
+    .edu-logo {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--brand), var(--lime));
+      color: #fff; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 6px 16px -4px rgba(16, 185, 129, 0.4);
+    }
+    .edu-item:hover .edu-logo { transform: rotate(-10deg) scale(1.08); }
+    .edu-year {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 700;
+      color: var(--brand); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .edu-school {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .edu-school .kh {
+      display: block; font-size: 15px;
+      font-weight: 500; color: var(--muted);
+      font-family: 'Kantumruy Pro', sans-serif;
+      margin-top: 2px;
+    }
+    .edu-dept { font-size: 13px; color: var(--muted); }
+    .edu-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .edu-desc.kh { font-size: 13.5px; line-height: 1.85; }
+
+    .edu-tags {
+      display: flex; flex-wrap: wrap;
+      gap: 6px; margin-top: 16px;
+    }
+    .edu-tags span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; padding: 4px 10px;
+      background: rgba(16, 185, 129, 0.1);
+      border-radius: 6px;
+      color: var(--brand); font-weight: 600;
+    }
+    .edu-tags span.kh { font-family: 'Kantumruy Pro', sans-serif; }
+
+    /* ============ SKILLS ============ */
+    .skills { max-width: 640px; margin-top: 32px; display: flex; flex-direction: column; gap: 20px; }
+    .skill-head {
+      display: flex; justify-content: space-between;
+      margin-bottom: 8px; font-size: 14px;
+    }
+    .skill-name { font-weight: 600; }
+    .skill-level {
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+    .skill-level .kh {
+      font-family: 'Kantumruy Pro', sans-serif;
+      font-size: 11px; margin-left: 4px;
+    }
+    .skill-bar {
+      height: 6px; background: rgba(16, 185, 129, 0.14);
+      border-radius: 999px; overflow: hidden;
+    }
+    .skill-fill {
+      height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--brand), var(--lime));
+      border-radius: 999px;
+      transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .skill-fill.animated { width: var(--w); }
+
+    /* ============ GUESTBOOK (v10 NEW) ============ */
+    .guestbook-form {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .guestbook-input,
+    .guestbook-textarea {
+      width: 100%;
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.25s;
+      outline: none;
+    }
+    .guestbook-input:focus,
+    .guestbook-textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .guestbook-textarea { resize: vertical; min-height: 80px; }
+    .guestbook-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .guestbook-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .guestbook-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .guestbook-entry {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      gap: 14px;
+      animation: slideIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .guestbook-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800;
+      font-size: 14px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      flex-shrink: 0;
+    }
+    .guestbook-content { flex: 1; }
+    .guestbook-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+    .guestbook-name { font-weight: 700; font-size: 14px; }
+    .guestbook-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .guestbook-msg {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .guestbook-msg.kh {
+      font-family: 'Kantumruy Pro', sans-serif;
+      line-height: 1.75;
+    }
+
+    /* ============ COMMAND PALETTE (v10 NEW) ============ */
+    .cmd-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 20000;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 15vh 24px 24px;
+      opacity: 0; visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .cmd-backdrop.open { opacity: 1; visibility: visible; }
+    .cmd-box {
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: scale(0.96) translateY(-10px);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .cmd-backdrop.open .cmd-box { transform: scale(1) translateY(0); }
+    .cmd-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cmd-input-wrap i {
+      color: var(--brand);
+      font-size: 14px;
+    }
+    .cmd-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+    }
+    .cmd-input::placeholder { color: var(--muted); }
+    .cmd-esc {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 3px 7px;
+      background: var(--code-bg);
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .cmd-list {
+      max-height: 340px;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    .cmd-group-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 10px 12px 6px;
+    }
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .cmd-item:hover,
+    .cmd-item.selected {
+      background: rgba(16, 185, 129, 0.12);
+    }
+    .cmd-item.selected {
+      border-left: 3px solid var(--brand);
+      padding-left: 9px;
+    }
+    .cmd-item-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--code-bg);
+      color: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .cmd-item-text { flex: 1; }
+    .cmd-item-title { font-weight: 600; font-size: 14px; }
+    .cmd-item-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .cmd-item-kbd {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 3px 6px;
+      background: var(--code-bg);
+      border-radius: 5px;
+      color: var(--muted);
+    }
+    .cmd-empty {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .cmd-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--code-bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .cmd-footer kbd {
+      padding: 2px 5px;
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 9px;
+      color: var(--text);
+    }
+
+    /* ============ CTA ============ */
+    .cta {
+      background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%);
+      border-radius: 24px;
+      padding: 60px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+    }
+    .cta::before, .cta::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%; filter: blur(80px); opacity: 0.5;
+    }
+    .cta::before { background: #10b981; top: -100px; right: -100px; }
+    .cta::after { background: #84cc16; bottom: -100px; left: -100px; }
+
+    .cta-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; margin-bottom: 24px;
+      position: relative; z-index: 1;
+    }
+    .cta-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700; letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      position: relative; z-index: 1;
+    }
+    .cta-title .kh {
+      display: block;
+      font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+      font-weight: 500; letter-spacing: 0;
+      color: #bbf7d0; margin-top: 8px;
+    }
+    .cta-text {
+      color: #bbf7d0; max-width: 480px;
+      margin: 0 auto 32px;
+      position: relative; z-index: 1;
+    }
+    .cta-text.kh { font-size: 15px; }
+
+    .cta-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; max-width: 640px;
+      margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+    @media (max-width: 640px) { .cta-cards { grid-template-columns: 1fr; } }
+
+    .cta-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+      text-align: left;
+    }
+    .cta-card:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.28);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px -12px rgba(16, 185, 129, 0.6);
+    }
+    .cta-icon {
+      width: 42px; height: 42px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: #fff;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .cta-card:hover .cta-icon { transform: rotate(-8deg) scale(1.08); }
+    .cta-icon.mail { background: linear-gradient(135deg, #ea4335, #fbbc04); }
+    .cta-icon.tg { background: linear-gradient(135deg, #38bdf8, #3b82f6); }
+    .cta-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: rgba(255,255,255,0.55);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .cta-val { font-size: 14px; font-weight: 600; color: #fff; }
+    .cta-arrow {
+      margin-left: auto; font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      transition: transform 0.3s, color 0.3s;
+    }
+    .cta-card:hover .cta-arrow { transform: translateX(6px); color: #fff; }
+
+    /* ============ FOOTER ============ */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0; margin-top: 60px;
+    }
+    .footer-inner {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap;
+      gap: 16px; font-size: 13px; color: var(--muted);
+    }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { transition: color 0.25s, transform 0.25s; display: inline-block; }
+    .footer-links a:hover { color: var(--brand); transform: translateY(-2px); }
+
+    /* ============ SCROLL TO TOP ============ */
+    .scroll-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--brand); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none;
+      box-shadow: 0 12px 32px -8px rgba(16, 185, 129, 0.6);
+      opacity: 0; visibility: hidden;
+      transform: translateY(20px) scale(0.9);
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      z-index: 90;
+    }
+    .scroll-top.show {
+      opacity: 1; visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .scroll-top:hover {
+      background: var(--lime);
+      transform: translateY(-4px) scale(1.08);
+    }
+    .scroll-top i { font-size: 14px; }
+
+    /* ============ TELEGRAM FLOAT ============ */
+    .telegram-float {
+      position: fixed; bottom: 24px; left: 24px;
+      width: 50px; height: 50px; border-radius: 50%;
+      background: linear-gradient(135deg, #38bdf8, #3b82f6);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; z-index: 95;
+      box-shadow: 0 12px 32px -8px rgba(56, 189, 248, 0.6);
+      transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      cursor: pointer;
+      animation: tgPulse 2.5s ease-in-out infinite;
+    }
+    .telegram-float:hover {
+      transform: scale(1.15) rotate(-8deg);
+      box-shadow: 0 16px 40px -8px rgba(56, 189, 248, 0.85);
+    }
+    @keyframes tgPulse {
+      0%, 100% { box-shadow: 0 12px 32px -8px rgba(56, 189, 248, 0.6), 0 0 0 0 rgba(56, 189, 248, 0.5); }
+      50%      { box-shadow: 0 12px 32px -8px rgba(56, 189, 248, 0.6), 0 0 0 14px rgba(56, 189, 248, 0); }
+    }
+    @media (max-width: 480px) {
+      .telegram-float { width: 44px; height: 44px; font-size: 18px; bottom: 20px; left: 20px; }
+    }
+
+    .lang-toggle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 6px 10px;
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text); cursor: pointer;
+      display: inline-flex; align-items: center; gap: 5px;
+      transition: all 0.3s;
+    }
+    .lang-toggle:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+      transform: translateY(-2px);
+    }
+    .lang-toggle .flag { font-size: 12px; }
+    @media (max-width: 900px) { .lang-toggle { display: none; } }
+
+    .avail-banner {
+      position: fixed; bottom: 90px; right: 24px;
+      background: var(--card-solid);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: var(--shadow-md);
+      z-index: 89;
+      opacity: 0; visibility: hidden;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+    }
+    .avail-banner.show {
+      opacity: 1; visibility: visible;
+      transform: translateY(0);
+    }
+    .avail-banner .kh { font-size: 11px; display: block; font-weight: 500; color: var(--muted); }
+    @media (max-width: 480px) { .avail-banner { display: none; } }
+
+    /* ============ BACK TO TOP INDICATOR ============ */
+    .section-indicator {
+      position: fixed;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 85;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s;
+    }
+    .section-indicator.show { opacity: 1; visibility: visible; }
+    .section-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .section-dot:hover,
+    .section-dot.active {
+      background: var(--brand);
+      transform: scale(1.4);
+    }
+    .section-dot::after {
+      content: attr(data-label);
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+    .section-dot:hover::after { opacity: 1; }
+    @media (max-width: 1100px) { .section-indicator { display: none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bg-layer, .bg-glow, .cursor-bar, .hero-avatar,
+      .hero-ring, .sparkle, .telegram-float, .marquee-track,
+      .hero-avatar::after { animation: none; }
+    }
+  </style>
+
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('theme');
+        const html = document.documentElement;
+        if (saved === 'dark') html.classList.add('dark');
+        else if (saved === 'light') html.classList.add('light');
+        else html.classList.add(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      } catch(e) {}
+    })();
+  </script>
+</head>
+
+<body>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-dots">
+        <span class="loader-dot"></span>
+        <span class="loader-dot"></span>
+        <span class="loader-dot"></span>
+      </div>
+      <div class="loader-text">Loading portfolio...</div>
+    </div>
+  </div>
+
+  <!-- CURSOR -->
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- BACKGROUND -->
+  <div class="bg-layer" aria-hidden="true">
+    <div class="bg-glow"></div>
+    <div class="bg-grid"></div>
+    <div class="sparkle" style="top: 15%; left: 20%; animation-delay: 0s;"></div>
+    <div class="sparkle" style="top: 40%; left: 75%; animation-delay: 1.5s;"></div>
+    <div class="sparkle" style="top: 65%; left: 30%; animation-delay: 3s;"></div>
+    <div class="sparkle" style="top: 80%; left: 65%; animation-delay: 4.5s;"></div>
+    <div class="sparkle" style="top: 25%; left: 50%; animation-delay: 2s;"></div>
+    <div class="sparkle" style="top: 55%; left: 10%; animation-delay: 5s;"></div>
+    <div class="sparkle" style="top: 70%; left: 88%; animation-delay: 2.8s;"></div>
+  </div>
+
+  <!-- SCROLL PROGRESS -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- TELEGRAM FLOAT -->
+  <a href="https://t.me/minsopanha" target="_blank" class="telegram-float" aria-label="Telegram">
+    <i class="fa-brands fa-telegram"></i>
+  </a>
+
+  <!-- AVAILABILITY BANNER -->
+  <div class="avail-banner" id="availBanner">
+    <i class="fa-solid fa-circle" style="color: #22c55e; font-size: 8px;"></i>
+    <div>
+      Available for work
+      <span class="kh">អាចធ្វើការបាន</span>
+    </div>
+  </div>
+
+  <!-- SECTION INDICATOR (v10 NEW) -->
+  <div class="section-indicator" id="sectionIndicator">
+    <div class="section-dot" data-section="hero" data-label="Home · ទំព័រដើម"></div>
+    <div class="section-dot" data-section="work" data-label="Projects · គម្រោង"></div>
+    <div class="section-dot" data-section="about" data-label="About · អំពី"></div>
+    <div class="section-dot" data-section="blog" data-label="Blog · ប្លុក"></div>
+    <div class="section-dot" data-section="education" data-label="Education · ការសិក្សា"></div>
+    <div class="section-dot" data-section="skills" data-label="Skills · ជំនាញ"></div>
+    <div class="section-dot" data-section="guestbook" data-label="Guestbook · សៀវភៅភ្ញៀវ"></div>
+    <div class="section-dot" data-section="contact" data-label="Contact · ទំនាក់ទំនង"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-check-circle"></i>
+    <span id="toastText">Copied!</span>
+  </div>
+
+  <!-- COMMAND PALETTE (v10 NEW) -->
+  <div class="cmd-backdrop" id="cmdBackdrop">
+    <div class="cmd-box">
+      <div class="cmd-input-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" class="cmd-input" id="cmdInput" placeholder="Type a command or search..." autocomplete="off">
+        <span class="cmd-esc">ESC</span>
+      </div>
+      <div class="cmd-list" id="cmdList">
+        <div class="cmd-group-label">Navigation</div>
+        <div class="cmd-item" data-action="goto" data-target="#work">
+          <div class="cmd-item-icon"><i class="fa-solid fa-rocket"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Projects</div>
+            <div class="cmd-item-sub">គម្រោង · See what I've built</div>
+          </div>
+          <span class="cmd-item-kbd">P</span>
+        </div>
+        <div class="cmd-item" data-action="goto" data-target="#about">
+          <div class="cmd-item-icon"><i class="fa-solid fa-user"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">About</div>
+            <div class="cmd-item-sub">អំពី · Who I am</div>
+          </div>
+          <span class="cmd-item-kbd">A</span>
+        </div>
+        <div class="cmd-item" data-action="goto" data-target="#blog">
+          <div class="cmd-item-icon"><i class="fa-solid fa-pen-fancy"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Blog</div>
+            <div class="cmd-item-sub">ប្លុក · Recent writing</div>
+          </div>
+          <span class="cmd-item-kbd">B</span>
+        </div>
+        <div class="cmd-item" data-action="goto" data-target="#education">
+          <div class="cmd-item-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Education</div>
+            <div class="cmd-item-sub">ការសិក្សា · Where I study</div>
+          </div>
+          <span class="cmd-item-kbd">E</span>
+        </div>
+        <div class="cmd-item" data-action="goto" data-target="#skills">
+          <div class="cmd-item-icon"><i class="fa-solid fa-code"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Skills</div>
+            <div class="cmd-item-sub">ជំនាញ · What I know</div>
+          </div>
+          <span class="cmd-item-kbd">S</span>
+        </div>
+        <div class="cmd-item" data-action="goto" data-target="#guestbook">
+          <div class="cmd-item-icon"><i class="fa-solid fa-book"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Guestbook</div>
+            <div class="cmd-item-sub">សៀវភៅភ្ញៀវ · Leave a message</div>
+          </div>
+          <span class="cmd-item-kbd">G</span>
+        </div>
+        <div class="cmd-item" data-action="goto" data-target="#contact">
+          <div class="cmd-item-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Contact</div>
+            <div class="cmd-item-sub">ទំនាក់ទំនង · Get in touch</div>
+          </div>
+          <span class="cmd-item-kbd">C</span>
+        </div>
+
+        <div class="cmd-group-label">Actions</div>
+        <div class="cmd-item" data-action="toggle-theme">
+          <div class="cmd-item-icon"><i class="fa-solid fa-moon"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Toggle theme</div>
+            <div class="cmd-item-sub">Switch light / dark mode</div>
+          </div>
+          <span class="cmd-item-kbd">T</span>
+        </div>
+        <div class="cmd-item" data-action="toggle-lang">
+          <div class="cmd-item-icon"><i class="fa-solid fa-language"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Toggle language</div>
+            <div class="cmd-item-sub">English ⇄ ខ្មែរ</div>
+          </div>
+          <span class="cmd-item-kbd">L</span>
+        </div>
+        <div class="cmd-item" data-action="copy-email">
+          <div class="cmd-item-icon"><i class="fa-solid fa-copy"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Copy email</div>
+            <div class="cmd-item-sub">Minsopanha@gmail.com</div>
+          </div>
+        </div>
+        <div class="cmd-item" data-action="open-telegram">
+          <div class="cmd-item-icon"><i class="fa-brands fa-telegram"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Open Telegram</div>
+            <div class="cmd-item-sub">@minsopanha</div>
+          </div>
+        </div>
+        <div class="cmd-item" data-action="scroll-top">
+          <div class="cmd-item-icon"><i class="fa-solid fa-arrow-up"></i></div>
+          <div class="cmd-item-text">
+            <div class="cmd-item-title">Scroll to top</div>
+            <div class="cmd-item-sub">Back to the beginning</div>
+          </div>
+        </div>
+      </div>
+      <div class="cmd-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+        <span><kbd>↵</kbd> select</span>
+        <span><kbd>ESC</kbd> close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT MODAL (v10 NEW) -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <div class="logo-mark">M</div>
+        <div>
+          <div class="logo-name">Minsopanha<span>.</span></div>
+          <div class="logo-sub">LEARNING · BUILDING</div>
+        </div>
+      </a>
+
+      <nav class="nav-desktop">
+        <a href="#work" class="nav-link" data-section="work">
+          <span class="en">Projects</span>
+          <span class="km">គម្រោង</span>
+        </a>
+        <a href="#about" class="nav-link" data-section="about">
+          <span class="en">About</span>
+          <span class="km">អំពី</span>
+        </a>
+        <a href="#blog" class="nav-link" data-section="blog">
+          <span class="en">Blog</span>
+          <span class="km">ប្លុក</span>
+        </a>
+        <a href="#education" class="nav-link" data-section="education">
+          <span class="en">Education</span>
+          <span class="km">ការសិក្សា</span>
+        </a>
+        <a href="#skills" class="nav-link" data-section="skills">
+          <span class="en">Skills</span>
+          <span class="km">ជំនាញ</span>
+        </a>
+        <a href="#guestbook" class="nav-link" data-section="guestbook">
+          <span class="en">Guestbook</span>
+          <span class="km">សៀវភៅភ្ញៀវ</span>
+        </a>
+        <a href="#contact" class="nav-link" data-section="contact">
+          <span class="en">Contact</span>
+          <span class="km">ទំនាក់ទំនង</span>
+        </a>
+      </nav>
+
+      <div class="header-actions">
+        <span class="live-time" id="liveTime">--:--</span>
+        <button class="cmd-trigger" id="cmdTrigger" title="Open command palette">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Search</span>
+          <span class="kbd">⌘K</span>
+        </button>
+        <button class="lang-toggle" id="langToggle" title="Toggle language">
+          <span class="flag" id="langFlag">🇰🇭</span>
+          <span id="langLabel">KH</span>
+        </button>
+        <button id="themeBtn" class="theme-toggle" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+        <button id="menuBtn" class="btn-icon" aria-label="menu">
+          <i class="fa-solid fa-bars" id="menuIcon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobileMenu" class="mobile-menu hidden">
+      <a href="#work" class="mobile-link"><span class="en">Projects</span><span class="km">គម្រោង</span></a>
+      <a href="#about" class="mobile-link"><span class="en">About</span><span class="km">អំពី</span></a>
+      <a href="#blog" class="mobile-link"><span class="en">Blog</span><span class="km">ប្លុក</span></a>
+      <a href="#education" class="mobile-link"><span class="en">Education</span><span class="km">ការសិក្សា</span></a>
+      <a href="#skills" class="mobile-link"><span class="en">Skills</span><span class="km">ជំនាញ</span></a>
+      <a href="#guestbook" class="mobile-link"><span class="en">Guestbook</span><span class="km">សៀវភៅភ្ញៀវ</span></a>
+      <a href="#contact" class="mobile-link"><span class="en">Contact</span><span class="km">ទំនាក់ទំនង</span></a>
+      <a href="mailto:Minsopanha@gmail.com" class="mobile-link mobile-mail">Minsopanha@gmail.com</a>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-badge">
+            <span class="dot-green"></span>
+            <span>Open to learning · Internship · Junior roles</span>
+          </div>
+
+          <h1 class="hero-title">
+            Hi, I'm <span class="accent">Minsopanha</span>.<br>
+            I'm learning to build<br>
+            for the web.
+            <span class="kh-line">
+              សួស្តី ខ្ញុំឈ្មោះ <span class="accent">Minsopanha</span>។ ខ្ញុំកំពុងរៀនបង្កើតគេហទំព័រ។
+            </span>
+          </h1>
+
+          <p class="hero-text">
+            A beginner web developer from Phnom Penh, currently studying at
+            <strong>RUPP</strong> — Royal University of Phnom Penh.
+            I'm learning <strong>HTML</strong>, <strong>CSS</strong>, and
+            <strong>JavaScript</strong> by building small projects every week.
+          </p>
+          <p class="hero-text kh">
+            អ្នកអភិវឌ្ឍន៍វេបសាយថ្មីថ្មោងមកពីភ្នំពេញ កំពុងសិក្សានៅ <strong>សាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ (RUPP)</strong>។ ខ្ញុំកំពុងរៀន <strong>HTML</strong> <strong>CSS</strong> និង <strong>JavaScript</strong> ដោយបង្កើតគម្រោងតូចៗរៀងរាល់សប្តាហ៍។
+          </p>
+
+          <div class="hero-typing">
+            <span id="typingText"></span>
+            <span class="cursor-bar"></span>
+          </div>
+
+          <div class="hero-cta">
+            <a href="#work" class="btn btn-dark">See my projects <i class="fa-solid fa-arrow-right"></i></a>
+            <button class="btn btn-ghost" id="heroCmdBtn"><i class="fa-solid fa-terminal"></i> Command palette</button>
+          </div>
+        </div>
+
+        <div class="hero-avatar-wrap">
+          <div class="hero-ring"></div>
+          <div class="hero-avatar">
+            <div class="hero-avatar-inner">
+              <div class="hero-avatar-initials"><img src="panhakh.jpg" alt=""></div>
+              <div class="hero-avatar-label">
+                Web Learner
+                <span class="kh">អ្នករៀនវេប</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-badge-float hero-badge-1">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>RUPP</span>
+          </div>
+          <div class="hero-badge-float hero-badge-2">
+            <i class="fa-solid fa-code"></i>
+            <span>HTML · CSS · JS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK STATS -->
+    <div class="quick-stats">
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="stat-num" data-count="1">0</div>
+        <div class="stat-lbl">University<span class="kh">សាកលវិទ្យាល័យ</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-code"></i></div>
+        <div class="stat-num" data-count="3">0</div>
+        <div class="stat-lbl">Languages<span class="kh">ភាសា</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-rocket"></i></div>
+        <div class="stat-num" data-count="3">0</div>
+        <div class="stat-lbl">Projects<span class="kh">គម្រោង</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-heart"></i></div>
+        <div class="stat-num" data-count="100" data-suffix="%">0</div>
+        <div class="stat-lbl">Honest<span class="kh">ស្មោះត្រង់</span></div>
+      </div>
+    </div>
+
+    <!-- MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span class="marquee-item"><i class="fa-solid fa-code"></i> HTML5</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-palette"></i> CSS3</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-brands fa-js"></i> JavaScript</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-brands fa-git-alt"></i> Git</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-brands fa-github"></i> GitHub</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-mobile-screen"></i> Responsive</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-graduation-cap"></i> RUPP <span class="kh">សាកលវិទ្យាល័យ</span></span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-location-dot"></i> Phnom Penh <span class="kh">ភ្នំពេញ</span></span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-code"></i> HTML5</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-palette"></i> CSS3</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-brands fa-js"></i> JavaScript</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-brands fa-git-alt"></i> Git</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-brands fa-github"></i> GitHub</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-mobile-screen"></i> Responsive</span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-graduation-cap"></i> RUPP <span class="kh">សាកលវិទ្យាល័យ</span></span>
+        <span class="marquee-dot"></span>
+        <span class="marquee-item"><i class="fa-solid fa-location-dot"></i> Phnom Penh <span class="kh">ភ្នំពេញ</span></span>
+        <span class="marquee-dot"></span>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <section id="work" class="section">
+      <div class="section-head">
+        <div>
+          <span class="section-label">Projects · 01</span>
+          <h2 class="section-title">
+            Things I've built
+            <span class="kh">អ្វីដែលខ្ញុំបានបង្កើត</span>
+          </h2>
+        </div>
+        <p class="section-sub">Small projects from my learning journey. Click any card for details.</p>
+        <p class="section-sub kh">គម្រោងតូចៗពីដំណើររៀនសូត្ររបស់ខ្ញុំ។ ចុចលើកាតណាមួយដើម្បីមើលព័ត៌មានលម្អិត។</p>
+      </div>
+
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="all">
+          <i class="fa-solid fa-layer-group"></i>
+          All <span class="filter-count" id="countAll">3</span>
+        </button>
+        <button class="filter-btn" data-filter="html">
+          <i class="fa-brands fa-html5"></i>
+          HTML <span class="filter-count">3</span>
+        </button>
+        <button class="filter-btn" data-filter="css">
+          <i class="fa-brands fa-css3-alt"></i>
+          CSS <span class="filter-count">3</span>
+        </button>
+        <button class="filter-btn" data-filter="javascript">
+          <i class="fa-brands fa-js"></i>
+          JavaScript <span class="filter-count">3</span>
+        </button>
+        <button class="filter-btn" data-filter="api">
+          <i class="fa-solid fa-cloud"></i>
+          API <span class="filter-count">1</span>
+        </button>
+      </div>
+
+      <div class="project-list" id="projectList">
+        <article class="project-h" data-tags="html css javascript localStorage" data-project="todo">
+          <div class="project-h-preview">
+            <div class="mock-window">
+              <div class="mock-bar">
+                <span class="mock-dot red"></span>
+                <span class="mock-dot yellow"></span>
+                <span class="mock-dot green"></span>
+                <span class="mock-url">todo.app</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-line w-60"></div>
+                <div class="mock-block"><i class="fa-solid fa-list-check"></i></div>
+                <div class="mock-line w-90"></div>
+                <div class="mock-line w-75"></div>
+              </div>
+            </div>
+          </div>
+          <div class="project-h-body">
+            <div class="project-h-number">PROJECT · 001</div>
+            <h3>To-Do List <span class="kh">បញ្ជីការងារត្រូវធ្វើ</span></h3>
+            <p>A simple to-do app where you can add, check off, and delete tasks. Saves to your browser using localStorage.</p>
+            <p class="kh">កម្មវិធីបញ្ជីការងារត្រូវធ្វើដ៏សាមញ្ញ ដែលអ្នកអាចបន្ថែម ធីក និងលុបការងារ។ រក្សាទុកក្នុងកម្មវិធីរុករករបស់អ្នកដោយប្រើ localStorage។</p>
+            <div class="project-h-tags">
+              <span>HTML</span><span>CSS</span><span>JavaScript</span><span>localStorage</span>
+            </div>
+            <a href="#" class="project-h-link">View details <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="project-h" data-tags="html css javascript" data-project="calc">
+          <div class="project-h-preview">
+            <div class="mock-window">
+              <div class="mock-bar">
+                <span class="mock-dot red"></span>
+                <span class="mock-dot yellow"></span>
+                <span class="mock-dot green"></span>
+                <span class="mock-url">calc.app</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-line w-50"></div>
+                <div class="mock-block"><i class="fa-solid fa-calculator"></i></div>
+                <div class="mock-line w-75"></div>
+                <div class="mock-line w-90"></div>
+              </div>
+            </div>
+          </div>
+          <div class="project-h-body">
+            <div class="project-h-number">PROJECT · 002</div>
+            <h3>Calculator <span class="kh">ម៉ាស៊ីនគិតលេខ</span></h3>
+            <p>A working calculator that handles basic math operations with a clean, responsive UI. My first UI project.</p>
+            <p class="kh">ម៉ាស៊ីនគិតលេខដែលដំណើរការបាន សម្រាប់ប្រតិបត្តិការគណិតវិទ្យាមូលដ្ឋាន ជាមួយចំណុចប្រទាក់ស្អាត និងឆ្លើយតបបានល្អ។ គម្រោង UI ដំបូងរបស់ខ្ញុំ។</p>
+            <div class="project-h-tags">
+              <span>HTML</span><span>CSS</span><span>JavaScript</span>
+            </div>
+            <a href="#" class="project-h-link">View details <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="project-h" data-tags="javascript css api fetch" data-project="weather">
+          <div class="project-h-preview">
+            <div class="mock-window">
+              <div class="mock-bar">
+                <span class="mock-dot red"></span>
+                <span class="mock-dot yellow"></span>
+                <span class="mock-dot green"></span>
+                <span class="mock-url">weather.app</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-line w-90"></div>
+                <div class="mock-block"><i class="fa-solid fa-cloud-sun"></i></div>
+                <div class="mock-line w-50"></div>
+                <div class="mock-line w-75"></div>
+              </div>
+            </div>
+          </div>
+          <div class="project-h-body">
+            <div class="project-h-number">PROJECT · 003</div>
+            <h3>Weather App <span class="kh">កម្មវិធីអាកាសធាតុ</span></h3>
+            <p>Search any city and see the current weather. My first project using a real API and async JavaScript.</p>
+            <p class="kh">ស្វែងរកទីក្រុងណាមួយ ហើយមើលអាកាសធាតុបច្ចុប្បន្ន។ គម្រោងដំបូងរបស់ខ្ញុំដែលប្រើ API ពិតប្រាកដ និង async JavaScript។</p>
+            <div class="project-h-tags">
+              <span>JavaScript</span><span>Fetch API</span><span>CSS</span>
+            </div>
+            <a href="#" class="project-h-link">View details <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+
+      <div class="projects-note">
+        <i class="fa-solid fa-circle-info"></i>
+        <div>
+          <p>More projects coming soon. I'm building something new every week.</p>
+          <p class="kh">គម្រោងបន្ថែមនឹងមកដល់ឆាប់ៗ។ ខ្ញុំកំពុងបង្កើតអ្វីថ្មីរៀងរាល់សប្តាហ៍។</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <div class="about-grid">
+        <div class="about-text">
+          <span class="section-label">About · 02</span>
+          <h2 class="section-title">
+            A beginner with a plan.
+            <span class="kh">អ្នកចាប់ផ្តើមដែលមានផែនការ។</span>
+          </h2>
+          <p>I started learning web development recently. No bootcamp, no CS degree — just curiosity, free tutorials, and a lot of practice.</p>
+          <p class="kh">ខ្ញុំបានចាប់ផ្តើមរៀនអភិវឌ្ឍន៍វេបសាយថ្មីៗនេះ។ គ្មាន bootcamp គ្មានសញ្ញាបត្រវិទ្យាសាស្ត្រកុំព្យូទ័រ — គ្រាន់តែចង់ដឹង ការបង្រៀនឥតគិតថ្លៃ និងការអនុវត្តច្រើន។</p>
+          <p>My goal is simple: get good enough to build real projects for real people. I'm currently focusing on the fundamentals — writing clean HTML, styling with CSS, and making things interactive with JavaScript.</p>
+          <p class="kh">គោលដៅរបស់ខ្ញុំគឺសាមញ្ញ៖ ក្លាយជាអ្នកដែលអាចបង្កើតគម្រោងពិតប្រាកដសម្រាប់មនុស្សពិត។ បច្ចុប្បន្នខ្ញុំផ្តោតលើមូលដ្ឋានគ្រឹះ — សរសេរ HTML ស្អាត តុបតែងដោយ CSS និងធ្វើឱ្យមានអន្តរកម្មដោយ JavaScript។</p>
+
+          <div class="about-contact">
+            <p class="mini-label">// REACH ME · ទាក់ទងខ្ញុំ</p>
+            <a href="mailto:Minsopanha@gmail.com" class="contact-line">
+              <span class="contact-icon mail"><i class="fa-regular fa-envelope"></i></span>
+              <div>
+                <div class="contact-lbl">Email · អ៊ីមែល</div>
+                <div class="contact-val">Minsopanha@gmail.com</div>
+              </div>
+              <button class="copy-btn" data-copy="Minsopanha@gmail.com" aria-label="Copy email">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </a>
+            <a href="https://t.me/minsopanha" target="_blank" class="contact-line">
+              <span class="contact-icon tg"><i class="fa-brands fa-telegram"></i></span>
+              <div>
+                <div class="contact-lbl">Telegram · តេឡេក្រាម</div>
+                <div class="contact-val">@minsopanha</div>
+              </div>
+              <button class="copy-btn" data-copy="@minsopanha" aria-label="Copy Telegram">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </a>
+          </div>
+        </div>
+
+        <div class="about-side">
+          <div class="info-card">
+            <div class="info-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="info-title">Currently learning · កំពុងរៀន</div>
+            <div class="info-value">HTML · CSS · JavaScript</div>
+          </div>
+          <div class="info-card">
+            <div class="info-icon"><i class="fa-solid fa-map-pin"></i></div>
+            <div class="info-title">Based in · រស់នៅ</div>
+            <div class="info-value">Phnom Penh, Cambodia<span class="kh">ភ្នំពេញ កម្ពុជា</span></div>
+          </div>
+          <div class="info-card">
+            <div class="info-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="info-title">Availability · ភាពអាចរកបាន</div>
+            <div class="info-value">Open to internships &amp; junior roles<span class="kh">បើកចំហសម្រាប់កម្មសិក្សា និងតួនាទីជាន់ទាប</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- BLOG (v10 NEW) -->
+    <section id="blog" class="section">
+      <span class="section-label">Blog · 03</span>
+      <h2 class="section-title">
+        Recent writing
+        <span class="kh">ការសរសេរថ្មីៗ</span>
+      </h2>
+      <p class="section-sub">Notes from my learning journey.</p>
+      <p class="section-sub kh">កំណត់ត្រាពីដំណើររៀនសូត្ររបស់ខ្ញុំ។</p>
+
+      <div class="blog-grid">
+        <article class="blog-card">
+          <div class="blog-thumb"><i class="fa-solid fa-cube"></i></div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span>Mar 2025</span>
+              <span class="dot"></span>
+              <span>5 min read</span>
+            </div>
+            <h3 class="blog-title">
+              Why I chose vanilla JS first
+              <span class="kh">ហេតុអ្វីខ្ញុំជ្រើសរើស JS សុទ្ធ</span>
+            </h3>
+            <p class="blog-excerpt">Frameworks come and go — but understanding the language itself is forever. Here's why I'm learning JavaScript without any framework.</p>
+            <a href="#" class="blog-link">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-thumb"><i class="fa-solid fa-mobile-screen"></i></div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span>Feb 2025</span>
+              <span class="dot"></span>
+              <span>4 min read</span>
+            </div>
+            <h3 class="blog-title">
+              Mobile-first CSS: lessons learned
+              <span class="kh">CSS មុនពេលទូរស័ព្ទ៖ មេរៀនដែលទទួលបាន</span>
+            </h3>
+            <p class="blog-excerpt">Writing styles from the smallest screen up changed how I think about layout. Some surprises and small wins along the way.</p>
+            <a href="#" class="blog-link">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-thumb"><i class="fa-solid fa-lightbulb"></i></div>
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span>Jan 2025</span>
+              <span class="dot"></span>
+              <span>6 min read</span>
+            </div>
+            <h3 class="blog-title">
+              Building in public: my first 3 projects
+              <span class="kh">ការសាងសង់ជាសាធារណៈ៖ គម្រោង ៣ ដំបូងរបស់ខ្ញុំ</span>
+            </h3>
+            <p class="blog-excerpt">Sharing unfinished work online is scary. But the feedback loop is unbeatable. Here's what I learned from shipping early.</p>
+            <a href="#" class="blog-link">Read more <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section id="education" class="section">
+      <span class="section-label">Education · 04</span>
+      <h2 class="section-title">
+        Where I study
+        <span class="kh">កន្លែងដែលខ្ញុំសិក្សា</span>
+      </h2>
+      <p class="section-sub">My academic background so far.</p>
+      <p class="section-sub kh">ប្រវត្តិការសិក្សារបស់ខ្ញុំរហូតមកដល់ពេលនេះ។</p>
+
+      <div class="edu-timeline">
+        <div class="edu-item">
+          <div class="edu-item-head">
+            <!-- <i class="fa-solid fa-university"></i> -->
+            <div class="edu-logo"><img src="rupp.jpg" alt=""></div>
+            <div>
+              <div class="edu-year">Present · Ongoing · បច្ចុប្បន្ន</div>
+              <h3 class="edu-school">
+                Royal University of Phnom Penh
+                <span class="kh">សាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ</span>
+              </h3>
+              <p class="edu-dept">RUPP · Phnom Penh, Cambodia</p>
+            </div>
+          </div>
+          <p class="edu-desc">Studying at RUPP while learning web development on my own. Combining university coursework with hands-on practice in HTML, CSS, and JavaScript — building small real projects each week to grow my skills.</p>
+          <p class="edu-desc kh">កំពុងសិក្សានៅ RUPP ព្រមទាំងរៀនអភិវឌ្ឍន៍វេបសាយដោយខ្លួនឯង។ រួមបញ្ចូលការសិក្សានៅសាកលវិទ្យាល័យជាមួយការអនុវត្តផ្ទាល់ដៃក្នុង HTML CSS និង JavaScript។</p>
+          <div class="edu-tags">
+            <span>RUPP</span>
+            <span>Phnom Penh</span>
+            <span class="kh">រៀនដោយខ្លួនឯង</span>
+            <span class="kh">មូលដ្ឋានវេប</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section">
+      <span class="section-label">Skills · 05</span>
+      <h2 class="section-title">
+        What I know so far
+        <span class="kh">អ្វីដែលខ្ញុំដឹងរហូតមកដល់ពេលនេះ</span>
+      </h2>
+      <p class="section-sub">Honest levels — I'm still learning every day.</p>
+      <p class="section-sub kh">កម្រិតស្មោះត្រង់ — ខ្ញុំនៅតែរៀនរាល់ថ្ងៃ។</p>
+
+      <div class="skills">
+        <div class="skill">
+          <div class="skill-head">
+            <span class="skill-name">HTML</span>
+            <span class="skill-level">Comfortable <span class="kh">ស្រួល</span></span>
+          </div>
+          <div class="skill-bar"><div class="skill-fill" style="--w:75%"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-head">
+            <span class="skill-name">CSS</span>
+            <span class="skill-level">Getting there <span class="kh">កំពុងរីកចម្រើន</span></span>
+          </div>
+          <div class="skill-bar"><div class="skill-fill" style="--w:65%"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-head">
+            <span class="skill-name">JavaScript</span>
+            <span class="skill-level">Learning <span class="kh">កំពុងរៀន</span></span>
+          </div>
+          <div class="skill-bar"><div class="skill-fill" style="--w:45%"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-head">
+            <span class="skill-name">Git &amp; GitHub</span>
+            <span class="skill-level">Basics <span class="kh">មូលដ្ឋាន</span></span>
+          </div>
+          <div class="skill-bar"><div class="skill-fill" style="--w:40%"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GUESTBOOK (v10 NEW) -->
+    <section id="guestbook" class="section">
+      <span class="section-label">Guestbook · 06</span>
+      <h2 class="section-title">
+        Sign my guestbook
+        <span class="kh">ចុះហត្ថលេខាក្នុងសៀវភៅភ្ញៀវ</span>
+      </h2>
+      <p class="section-sub">Leave a short message — it stays in your browser.</p>
+      <p class="section-sub kh">ទុកសារខ្លីៗ — វានឹងរក្សាទុកក្នុងកម្មវិធីរុករករបស់អ្នក។</p>
+
+      <form class="guestbook-form" id="guestbookForm" autocomplete="off">
+        <input type="text" class="guestbook-input" id="gbName" placeholder="Your name · ឈ្មោះរបស់អ្នក" maxlength="40" required>
+        <textarea class="guestbook-textarea" id="gbMessage" placeholder="Your message · សាររបស់អ្នក" maxlength="280" required></textarea>
+        <div class="guestbook-actions">
+          <span class="guestbook-hint" id="gbCount">0 / 280</span>
+          <button type="submit" class="btn btn-dark">
+            Sign <i class="fa-solid fa-pen-nib"></i>
+          </button>
+        </div>
+      </form>
+
+      <div class="guestbook-list" id="guestbookList">
+        <!-- Entries inserted by JS -->
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+      <div class="cta">
+        <span class="cta-badge">
+          <span class="dot-green"></span>
+          Open to opportunities · បើកចំហសម្រាប់ឱកាស
+        </span>
+        <h2 class="cta-title">
+          Let's talk.
+          <span class="kh">តោះនិយាយគ្នា។</span>
+        </h2>
+        <p class="cta-text">Whether you have advice, a small project, or just want to say hi — I'd love to hear from you.</p>
+        <p class="cta-text kh">មិនថាអ្នកមានដំបូន្មាន គម្រោងតូច ឬគ្រាន់តែចង់ស្វាគមន៍ — ខ្ញុំចង់ស្តាប់ពីអ្នក។</p>
+
+        <div class="cta-cards">
+          <a href="mailto:Minsopanha@gmail.com" class="cta-card">
+            <span class="cta-icon mail"><i class="fa-regular fa-envelope"></i></span>
+            <div>
+              <div class="cta-lbl">Email · អ៊ីមែល</div>
+              <div class="cta-val">Minsopanha@gmail.com</div>
+            </div>
+            <i class="fa-solid fa-arrow-right cta-arrow"></i>
+          </a>
+          <a href="https://t.me/minsopanha" target="_blank" class="cta-card">
+            <span class="cta-icon tg"><i class="fa-brands fa-telegram"></i></span>
+            <div>
+              <div class="cta-lbl">Telegram · តេឡេក្រាម</div>
+              <div class="cta-val">@minsopanha</div>
+            </div>
+            <i class="fa-solid fa-arrow-right cta-arrow"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> Minsopanha · Built while learning at RUPP</p>
+      <p class="kh">© <span id="yearKh"></span> Minsopanha · សាងសង់ខណៈពេលរៀននៅ RUPP</p>
+      <div class="footer-links">
+        <a href="mailto:Minsopanha@gmail.com">Email</a>
+        <a href="https://t.me/minsopanha" target="_blank">Telegram</a>
+      </div>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ===== LOADER ===== */
+      window.addEventListener('load', () => {
+        setTimeout(() => document.getElementById('loader').classList.add('hidden'), 600);
+      });
+
+      /* ===== YEAR ===== */
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+      const yearKhEl = document.getElementById('yearKh');
+      if (yearKhEl) yearKhEl.textContent = new Date().getFullYear();
+
+      /* ===== THEME ===== */
+      const themeBtn = document.getElementById('themeBtn');
+      const themeIcon = document.getElementById('themeIcon');
+      const html = document.documentElement;
+
+      function syncIcon() {
+        themeIcon.className = html.classList.contains('dark')
+          ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+      syncIcon();
+
+      themeBtn.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+          html.classList.remove('dark'); html.classList.add('light');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.classList.remove('light'); html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        syncIcon();
+      });
+
+      /* ===== LANGUAGE ===== */
+      const langToggle = document.getElementById('langToggle');
+      const langFlag = document.getElementById('langFlag');
+      const langLabel = document.getElementById('langLabel');
+      let currentLang = localStorage.getItem('lang') || 'en';
+      function applyLang() {
+        if (currentLang === 'kh') {
+          langFlag.textContent = '🇬🇧';
+          langLabel.textContent = 'EN';
+          document.documentElement.setAttribute('lang', 'km');
+          document.body.classList.add('show-kh');
+        } else {
+          langFlag.textContent = '🇰🇭';
+          langLabel.textContent = 'KH';
+          document.documentElement.setAttribute('lang', 'en');
+          document.body.classList.remove('show-kh');
+        }
+        localStorage.setItem('lang', currentLang);
+      }
+      applyLang();
+      if (langToggle) {
+        langToggle.addEventListener('click', () => {
+          currentLang = currentLang === 'en' ? 'kh' : 'en';
+          applyLang();
+        });
+      }
+
+      /* ===== TIME ===== */
+      const timeEl = document.getElementById('liveTime');
+      function updateTime() {
+        if (!timeEl) return;
+        const now = new Date();
+        const pp = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Phnom_Penh' }));
+        timeEl.textContent = `${String(pp.getHours()).padStart(2,'0')}:${String(pp.getMinutes()).padStart(2,'0')} · PNH`;
+      }
+      updateTime();
+      setInterval(updateTime, 30000);
+
+      /* ===== CURSOR ===== */
+      const cursorDot = document.getElementById('cursorDot');
+      if (window.matchMedia('(min-width: 1025px)').matches) {
+        document.addEventListener('mousemove', (e) => {
+          cursorDot.style.left = e.clientX + 'px';
+          cursorDot.style.top = e.clientY + 'px';
+        });
+        document.querySelectorAll('a, button, .project-h, .info-card, .edu-item, .cta-card, .contact-line, .stat-box, .testimonial, .filter-btn, .blog-card, .cmd-item, .guestbook-entry').forEach(el => {
+          el.addEventListener('mouseenter', () => cursorDot.classList.add('hover'));
+          el.addEventListener('mouseleave', () => cursorDot.classList.remove('hover'));
+        });
+        document.addEventListener('mouseleave', () => cursorDot.style.opacity = '0');
+        document.addEventListener('mouseenter', () => cursorDot.style.opacity = '1');
+      }
+
+      /* ===== TYPING ===== */
+      const typingEl = document.getElementById('typingText');
+      const words = ['learner', 'builder', 'student', 'dreamer', 'creating'];
+      let wI = 0, cI = 0, del = false;
+      function type() {
+        if (!typingEl) return;
+        const w = words[wI];
+        if (!del) {
+          typingEl.textContent = w.slice(0, cI + 1);
+          cI++;
+          if (cI === w.length) { del = true; setTimeout(type, 1600); return; }
+        } else {
+          typingEl.textContent = w.slice(0, cI - 1);
+          cI--;
+          if (cI === 0) { del = false; wI = (wI + 1) % words.length; }
+        }
+        setTimeout(type, del ? 60 : 110);
+      }
+      type();
+
+      /* ===== SCROLL PROGRESS ===== */
+      const bar = document.getElementById('scrollProgress');
+      window.addEventListener('scroll', () => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (window.scrollY / h) * 100 + '%';
+      }, { passive: true });
+
+      /* ===== HEADER ===== */
+      const header = document.getElementById('header');
+      window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 40);
+      }, { passive: true });
+
+      /* ===== ACTIVE NAV ===== */
+      const navLinks = document.querySelectorAll('.nav-link[data-section]');
+      const sections = document.querySelectorAll('section[id]');
+      const sectionDots = document.querySelectorAll('.section-dot');
+      function setActiveNav() {
+        let current = 'hero';
+        sections.forEach(s => {
+          if (window.scrollY >= s.offsetTop - 200) current = s.id;
+        });
+        navLinks.forEach(l => l.classList.toggle('active', l.dataset.section === current));
+        sectionDots.forEach(d => d.classList.toggle('active', d.dataset.section === current));
+        const indicator = document.getElementById('sectionIndicator');
+        if (window.scrollY > 300) indicator.classList.add('show');
+        else indicator.classList.remove('show');
+      }
+      window.addEventListener('scroll', setActiveNav, { passive: true });
+      setActiveNav();
+
+      /* ===== SECTION DOTS ===== */
+      sectionDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+          const target = document.getElementById(dot.dataset.section);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      /* ===== MOBILE MENU ===== */
+      const menuBtn = document.getElementById('menuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const menuIcon = document.getElementById('menuIcon');
+      if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+          const open = !mobileMenu.classList.contains('hidden');
+          mobileMenu.classList.toggle('hidden');
+          menuIcon.className = open ? 'fa-solid fa-bars' : 'fa-solid fa-xmark';
+        });
+        document.querySelectorAll('.mobile-link').forEach(l => {
+          l.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            menuIcon.className = 'fa-solid fa-bars';
+          });
+        });
+      }
+
+      /* ===== SMOOTH SCROLL ===== */
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', function (e) {
+          const id = this.getAttribute('href');
+          if (id === '#') return;
+          const el = document.querySelector(id);
+          if (el) {
+            e.preventDefault();
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      /* ===== SCROLL TOP + AVAIL ===== */
+      const scrollTopBtn = document.getElementById('scrollTop');
+      const availBanner = document.getElementById('availBanner');
+      window.addEventListener('scroll', () => {
+        const show = window.scrollY > 400;
+        scrollTopBtn.classList.toggle('show', show);
+        if (availBanner) availBanner.classList.toggle('show', window.scrollY > 800);
+      }, { passive: true });
+      scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      /* ===== SKILL BARS ===== */
+      const skillObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animated');
+            skillObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      document.querySelectorAll('.skill-fill').forEach(el => skillObserver.observe(el));
+
+      /* ===== COUNTERS ===== */
+      const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseInt(el.dataset.count, 10);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1400;
+            const startTime = performance.now();
+            function updateCount(t) {
+              const p = Math.min((t - startTime) / duration, 1);
+              const eased = 1 - Math.pow(1 - p, 4);
+              el.textContent = Math.round(eased * target) + suffix;
+              if (p < 1) requestAnimationFrame(updateCount);
+              else el.textContent = target + suffix;
+            }
+            requestAnimationFrame(updateCount);
+            counterObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+      document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+      /* ===== FILTER ===== */
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const projectCards = document.querySelectorAll('.project-h');
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          projectCards.forEach(card => {
+            const tags = card.dataset.tags || '';
+            if (filter === 'all' || tags.includes(filter)) {
+              card.classList.remove('filtered-out');
+            } else {
+              card.classList.add('filtered-out');
+            }
+          });
+        });
+      });
+
+      /* ===== COPY ===== */
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      function showToast(msg) {
+        toastText.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      }
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const text = btn.dataset.copy;
+          navigator.clipboard.writeText(text).then(() => {
+            btn.classList.add('copied');
+            const icon = btn.querySelector('i');
+            const original = icon.className;
+            icon.className = 'fa-solid fa-check';
+            showToast('Copied: ' + text);
+            setTimeout(() => {
+              btn.classList.remove('copied');
+              icon.className = original;
+            }, 2000);
+          });
+        });
+      });
+
+      /* ===== PARALLAX ===== */
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            const y = window.scrollY;
+            document.querySelectorAll('.sparkle').forEach((s, i) => {
+              s.style.transform = `translateY(${y * (0.05 + i * 0.02)}px)`;
+            });
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+
+      /* ===== PROJECT MODAL (v10) ===== */
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const modalContent = document.getElementById('modalContent');
+      const projectData = {
+        todo: {
+          number: 'PROJECT · 001',
+          title: 'To-Do List',
+          titleKh: 'បញ្ជីការងារត្រូវធ្វើ',
+          desc: 'A simple, focused task manager. Add, check off, and delete tasks — all saved in your browser with localStorage so nothing is lost on refresh.',
+          descKh: 'កម្មវិធីគ្រប់គ្រងការងារដ៏សាមញ្ញ និងផ្តោត។ បន្ថែម ធីក និងលុបការងារ — រក្សាទុកក្នុងកម្មវិធីរុករកដោយ localStorage។',
+          features: [
+            'Add, edit, complete, delete tasks',
+            'Persists across page reloads via localStorage',
+            'Responsive layout, keyboard-accessible'
+          ],
+          featuresKh: [
+            'បន្ថែម កែ បញ្ចប់ និងលុបការងារ',
+            'រក្សាទុកឆ្លងកាត់ការផ្ទុកទំព័រឡើងវិញ',
+            'ឆ្លើយតប និងអាចប្រើក្តារចុចបាន'
+          ],
+          tags: ['HTML', 'CSS', 'JavaScript', 'localStorage'],
+          icon: 'fa-solid fa-list-check',
+          url: 'todo.app'
+        },
+        calc: {
+          number: 'PROJECT · 002',
+          title: 'Calculator',
+          titleKh: 'ម៉ាស៊ីនគិតលេខ',
+          desc: 'My first UI project. Handles basic arithmetic with a clean layout, keyboard support, and careful edge-case handling for divide-by-zero and decimals.',
+          descKh: 'គម្រោង UI ដំបូងរបស់ខ្ញុំ។ ដោះស្រាយគណិតវិទ្យាមូលដ្ឋាន ជាមួយប្លង់ស្អាត និងការគាំទ្រក្តារចុច។',
+          features: [
+            'Basic operations: + − × ÷',
+            'Keyboard input support',
+            'Handles divide-by-zero and decimals'
+          ],
+          featuresKh: [
+            'ប្រតិបត្តិការមូលដ្ឋាន៖ + − × ÷',
+            'គាំទ្រការបញ្ចូលដោយក្តារចុច',
+            'ដោះស្រាយការចែកនឹងសូន្យ និងទសភាគ'
+          ],
+          tags: ['HTML', 'CSS', 'JavaScript'],
+          icon: 'fa-solid fa-calculator',
+          url: 'calc.app'
+        },
+        weather: {
+          number: 'PROJECT · 003',
+          title: 'Weather App',
+          titleKh: 'កម្មវិធីអាកាសធាតុ',
+          desc: 'Search any city and see the current weather. My first project calling a real API with fetch and async/await, plus error handling for bad input.',
+          descKh: 'ស្វែងរកទីក្រុងណាមួយ និងមើលអាកាសធាតុបច្ចុប្បន្ន។ គម្រោងដំបូងដែលហៅ API ពិតប្រាកដដោយ fetch និង async/await។',
+          features: [
+            'Live weather from OpenWeather API',
+            'Async/await with loading states',
+            'Graceful errors for unknown cities'
+          ],
+          featuresKh: [
+            'អាកាសធាតុផ្ទាល់ពី OpenWeather API',
+            'ប្រើ async/await ជាមួយស្ថានភាពផ្ទុក',
+            'ដោះស្រាយកំហុសសម្រាប់ទីក្រុងដែលមិនស្គាល់'
+          ],
+          tags: ['JavaScript', 'Fetch API', 'Async/Await', 'CSS'],
+          icon: 'fa-solid fa-cloud-sun',
+          url: 'weather.app'
+        }
+      };
+
+      function openModal(id) {
+        const d = projectData[id];
+        if (!d) return;
+        modalContent.innerHTML = `
+          <button class="modal-close" id="modalCloseBtn" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+          <div class="modal-number">${d.number}</div>
+          <div class="modal-title">${d.title}</div>
+          <div class="modal-title-kh kh">${d.titleKh}</div>
+          <div class="modal-preview">
+            <div class="mock-window">
+              <div class="mock-bar">
+                <span class="mock-dot red"></span>
+                <span class="mock-dot yellow"></span>
+                <span class="mock-dot green"></span>
+                <span class="mock-url">${d.url}</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-line w-60"></div>
+                <div class="mock-block"><i class="${d.icon}"></i></div>
+                <div class="mock-line w-90"></div>
+                <div class="mock-line w-75"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-section-title">Overview · ទិដ្ឋភាពទូទៅ</div>
+          <p class="modal-desc">${d.desc}</p>
+          <p class="modal-desc kh">${d.descKh}</p>
+          <div class="modal-section-title">Key features · លក្ខណៈពិសេស</div>
+          <ul class="modal-features">
+            ${d.features.map((f, i) => `
+              <li><i class="fa-solid fa-circle-check"></i><div><div>${f}</div><div class="kh" style="font-size:12.5px;color:var(--muted);margin-top:2px;">${d.featuresKh[i]}</div></div></li>
+            `).join('')}
+          </ul>
+          <div class="modal-section-title">Tech stack · បច្ចេកវិទ្យា</div>
+          <div class="modal-tags">
+            ${d.tags.map(t => `<span>${t}</span>`).join('')}
+          </div>
+          <div class="modal-actions">
+            <a href="#" class="btn btn-dark">Live demo <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            <a href="#" class="btn btn-ghost">Source <i class="fa-brands fa-github"></i></a>
+          </div>
+        `;
+        modalBackdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+      }
+
+      function closeModal() {
+        modalBackdrop.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      projectCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.project-h-link')) return;
+          openModal(card.dataset.project);
+        });
+      });
+      modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) closeModal();
+      });
+
+      /* ===== COMMAND PALETTE (v10) ===== */
+      const cmdBackdrop = document.getElementById('cmdBackdrop');
+      const cmdInput = document.getElementById('cmdInput');
+      const cmdItems = document.querySelectorAll('.cmd-item');
+      let selectedIdx = 0;
+      let visibleItems = Array.from(cmdItems);
+
+      function openCmd() {
+        cmdBackdrop.classList.add('open');
+        cmdInput.value = '';
+        filterCmd('');
+        setTimeout(() => cmdInput.focus(), 50);
+      }
+      function closeCmd() {
+        cmdBackdrop.classList.remove('open');
+      }
+      function filterCmd(query) {
+        const q = query.trim().toLowerCase();
+        visibleItems = [];
+        cmdItems.forEach(item => {
+          const text = item.textContent.toLowerCase();
+          const match = !q || text.includes(q);
+          item.style.display = match ? 'flex' : 'none';
+          if (match) visibleItems.push(item);
+        });
+        selectedIdx = 0;
+        updateSelection();
+        // Empty state
+        const list = document.getElementById('cmdList');
+        let empty = list.querySelector('.cmd-empty');
+        if (visibleItems.length === 0) {
+          if (!empty) {
+            empty = document.createElement('div');
+            empty.className = 'cmd-empty';
+            empty.textContent = 'No results · គ្មានលទ្ធផល';
+            list.appendChild(empty);
+          }
+        } else if (empty) {
+          empty.remove();
+        }
+      }
+      function updateSelection() {
+        visibleItems.forEach((it, i) => it.classList.toggle('selected', i === selectedIdx));
+        if (visibleItems[selectedIdx]) {
+          visibleItems[selectedIdx].scrollIntoView({ block: 'nearest' });
+        }
+      }
+      function runAction(item) {
+        const action = item.dataset.action;
+        if (action === 'goto') {
+          const target = document.querySelector(item.dataset.target);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        } else if (action === 'toggle-theme') {
+          themeBtn.click();
+        } else if (action === 'toggle-lang') {
+          langToggle.click();
+        } else if (action === 'copy-email') {
+          navigator.clipboard.writeText('Minsopanha@gmail.com').then(() => showToast('Copied: Minsopanha@gmail.com'));
+        } else if (action === 'open-telegram') {
+          window.open('https://t.me/minsopanha', '_blank');
+        } else if (action === 'scroll-top') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        closeCmd();
+      }
+
+      document.getElementById('cmdTrigger').addEventListener('click', openCmd);
+      document.getElementById('heroCmdBtn').addEventListener('click', openCmd);
+
+      cmdInput.addEventListener('input', (e) => filterCmd(e.target.value));
+      cmdInput.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (visibleItems.length) { selectedIdx = (selectedIdx + 1) % visibleItems.length; updateSelection(); }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (visibleItems.length) { selectedIdx = (selectedIdx - 1 + visibleItems.length) % visibleItems.length; updateSelection(); }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (visibleItems[selectedIdx]) runAction(visibleItems[selectedIdx]);
+        } else if (e.key === 'Escape') {
+          closeCmd();
+        }
+      });
+      cmdItems.forEach(item => {
+        item.addEventListener('click', () => runAction(item));
+        item.addEventListener('mouseenter', () => {
+          selectedIdx = visibleItems.indexOf(item);
+          updateSelection();
+        });
+      });
+      cmdBackdrop.addEventListener('click', (e) => {
+        if (e.target === cmdBackdrop) closeCmd();
+      });
+
+      // Global shortcuts
+      document.addEventListener('keydown', (e) => {
+        // ⌘K / Ctrl+K
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          openCmd();
+        }
+        // ESC closes modal too
+        if (e.key === 'Escape') {
+          if (modalBackdrop.classList.contains('open')) closeModal();
+        }
+        // Quick nav single keys (when not typing)
+        if (cmdBackdrop.classList.contains('open')) return;
+        const tag = document.activeElement.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const map = { p: '#work', a: '#about', b: '#blog', e: '#education', s: '#skills', g: '#guestbook', c: '#contact' };
+        if (map[e.key.toLowerCase()]) {
+          const target = document.querySelector(map[e.key.toLowerCase()]);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        }
+        if (e.key.toLowerCase() === 't') themeBtn.click();
+        if (e.key.toLowerCase() === 'l') langToggle.click();
+      });
+
+      /* ===== GUESTBOOK (v10) ===== */
+      const gbForm = document.getElementById('guestbookForm');
+      const gbName = document.getElementById('gbName');
+      const gbMessage = document.getElementById('gbMessage');
+      const gbCount = document.getElementById('gbCount');
+      const gbList = document.getElementById('guestbookList');
+      const GB_KEY = 'minsopanha_guestbook';
+
+      const avatarColors = [
+        'linear-gradient(135deg,#059669,#84cc16)',
+        'linear-gradient(135deg,#3b82f6,#38bdf8)',
+        'linear-gradient(135deg,#f59e0b,#f97316)',
+        'linear-gradient(135deg,#8b5cf6,#ec4899)',
+        'linear-gradient(135deg,#10b981,#14b8a6)',
+        'linear-gradient(135deg,#ef4444,#f97316)'
+      ];
+
+      function loadGuestbook() {
+        try {
+          const raw = localStorage.getItem(GB_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch(e) { return []; }
+      }
+      function saveGuestbook(entries) {
+        try { localStorage.setItem(GB_KEY, JSON.stringify(entries.slice(0, 50))); } catch(e) {}
+      }
+      function formatTime(ts) {
+        const diff = Date.now() - ts;
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'just now · ទើបនេះ';
+        if (mins < 60) return mins + 'm ago';
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + 'h ago';
+        const days = Math.floor(hrs / 24);
+        if (days < 7) return days + 'd ago';
+        return new Date(ts).toLocaleDateString();
+      }
+      function renderGuestbook() {
+        const entries = loadGuestbook();
+        if (!entries.length) {
+          gbList.innerHTML = `
+            <div style="text-align:center;color:var(--muted);font-size:13px;padding:24px;font-family:'JetBrains Mono',monospace;">
+              No entries yet · មិនទាន់មានធាតុ
+            </div>`;
+          return;
+        }
+        gbList.innerHTML = entries.map((e, i) => {
+          const color = avatarColors[i % avatarColors.length];
+          const initial = (e.name || '?').charAt(0).toUpperCase();
+          return `
+            <div class="guestbook-entry">
+              <div class="guestbook-avatar" style="background:${color}">${initial}</div>
+              <div class="guestbook-content">
+                <div class="guestbook-header">
+                  <span class="guestbook-name">${escapeHtml(e.name)}</span>
+                  <span class="guestbook-time">${formatTime(e.ts)}</span>
+                </div>
+                <div class="guestbook-msg">${escapeHtml(e.message)}</div>
+              </div>
+            </div>`;
+        }).join('');
+      }
+      function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, c => ({
+          '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+        }[c]));
+      }
+
+      gbMessage.addEventListener('input', () => {
+        gbCount.textContent = gbMessage.value.length + ' / 280';
+      });
+      gbForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = gbName.value.trim();
+        const message = gbMessage.value.trim();
+        if (!name || !message) return;
+        const entries = loadGuestbook();
+        entries.unshift({ name, message, ts: Date.now() });
+        saveGuestbook(entries);
+        gbForm.reset();
+        gbCount.textContent = '0 / 280';
+        renderGuestbook();
+        showToast('Thanks for signing! · អរគុណ!');
+      });
+
+      renderGuestbook();
+
+    })();
+  </script>
+</body>
+</html>
