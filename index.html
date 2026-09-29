@@ -2,9 +2,18 @@
 <html lang="en" class="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <meta name="theme-color" content="#f97316">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
   <title>Minsopanha · Full-Stack Learner · RUPP</title>
   <meta name="description" content="Beginner web developer at RUPP. Building projects with HTML, CSS, JavaScript.">
+
+  <meta property="og:title" content="Minsopanha · Full-Stack Learner">
+  <meta property="og:description" content="Building projects with HTML, CSS, JavaScript at RUPP.">
+  <meta property="og:type" content="website">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -21,26 +30,6 @@
             display: ['"Plus Jakarta Sans"', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
             khmer: ['"Kantumruy Pro"', 'sans-serif']
-          },
-          animation: {
-            'gradient-x': 'gradient-x 4s ease infinite',
-            'float': 'float 6s ease-in-out infinite',
-            'spin-slow': 'spin 40s linear infinite',
-            'shimmer': 'shimmer 2.5s linear infinite'
-          },
-          keyframes: {
-            'gradient-x': {
-              '0%,100%': { 'background-position': '0% 50%' },
-              '50%': { 'background-position': '100% 50%' }
-            },
-            'float': {
-              '0%,100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-12px)' }
-            },
-            'shimmer': {
-              '0%': { transform: 'translateX(-100%)' },
-              '100%': { transform: 'translateX(100%)' }
-            }
           }
         }
       }
@@ -55,50 +44,134 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-brand-50 via-ink-50 to-brand-100 dark:from-ink-900 dark:via-ink-900 dark:to-brand-900 text-ink-900 dark:text-ink-50 transition-colors duration-500 overflow-x-hidden selection:bg-brand-500 selection:text-white">
+<body class="min-h-screen bg-gradient-to-br from-brand-50 via-ink-50 to-brand-100 dark:from-ink-900 dark:via-ink-900 dark:to-brand-900 text-ink-900 dark:text-ink-50 transition-colors duration-300 overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+  <!-- ============ FIREBASE ANALYTICS TRACKER (real cross-visitor) ============ -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc }
+      from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCy7tXWYrhHxtzLyvPifTHZAnxVvMcTS1c",
+      authDomain: "minsopanha-portfolio.firebaseapp.com",
+      projectId: "minsopanha-portfolio",
+      storageBucket: "minsopanha-portfolio.firebasestorage.app",
+      messagingSenderId: "438552399716",
+      appId: "1:438552399716:web:ef1e0bb8de65c28d22b471",
+      measurementId: "G-JX94HLHFVB"
+    };
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      /* ---------- Detect device/browser ---------- */
+      const ua = navigator.userAgent;
+      let device = 'desktop';
+      if (/iPad|Tablet/i.test(ua)) device = 'tablet';
+      else if (/Android/i.test(ua)) device = 'android';
+      else if (/iPhone|iPod/i.test(ua)) device = 'ios';
+      else if (/Mobile/i.test(ua)) device = 'mobile';
+      else if (/Macintosh/i.test(ua)) device = 'mac';
+      else if (/Windows/i.test(ua)) device = 'windows';
+
+      let browser = 'other';
+      if (/Edg\//i.test(ua)) browser = 'Edge';
+      else if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua)) browser = 'Chrome';
+      else if (/Firefox\//i.test(ua)) browser = 'Firefox';
+      else if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+
+      const page = location.pathname || '/';
+
+      /* ---------- Session (30 min) ---------- */
+      const SESSION_KEY = 'minsopanha_session_id';
+      const SESSION_TS  = 'minsopanha_session_ts';
+      const now = Date.now();
+      const lastTs = parseInt(localStorage.getItem(SESSION_TS) || '0', 10);
+      const isNewSession = !lastTs || (now - lastTs) > 30 * 60 * 1000;
+
+      let sessionId = localStorage.getItem(SESSION_KEY);
+      if (isNewSession || !sessionId) {
+        sessionId = 's_' + now + '_' + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem(SESSION_KEY, sessionId);
+      }
+      localStorage.setItem(SESSION_TS, String(now));
+      const startTime = now;
+
+      /* ---------- Push session to Firestore ---------- */
+      if (isNewSession || !lastTs) {
+        await setDoc(doc(db, 'sessions', sessionId), {
+          start: serverTimestamp(),
+          device, browser, page,
+          duration: 0,
+          userAgent: ua.slice(0, 200)
+        });
+      }
+
+      /* ---------- Push page view ---------- */
+      await addDoc(collection(db, 'visits'), {
+        ts: serverTimestamp(),
+        page, device, browser, sessionId
+      });
+
+      /* ---------- Update duration on exit / interval ---------- */
+      const sendDuration = () => {
+        const dur = Math.round((Date.now() - startTime) / 1000);
+        if (dur > 0) {
+          updateDoc(doc(db, 'sessions', sessionId), {
+            duration: dur,
+            lastSeen: serverTimestamp()
+          }).catch(() => {});
+        }
+      };
+      window.addEventListener('beforeunload', sendDuration);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') sendDuration();
+      });
+      setInterval(sendDuration, 60000);
+
+    } catch (err) {
+      console.warn('[Analytics] Firebase init failed:', err);
+    }
+  </script>
 
   <!-- LOADER -->
   <div id="loader" class="loader">
     <div class="flex flex-col items-center gap-4">
       <div class="flex gap-2">
-        <span class="w-3 h-3 rounded-full bg-brand-500 animate-bounce"></span>
-        <span class="w-3 h-3 rounded-full bg-pink-500 animate-bounce" style="animation-delay:.1s"></span>
-        <span class="w-3 h-3 rounded-full bg-cyan-500 animate-bounce" style="animation-delay:.2s"></span>
+        <span class="loader-dot bg-brand-500"></span>
+        <span class="loader-dot bg-pink-500" style="animation-delay:.15s"></span>
+        <span class="loader-dot bg-cyan-500" style="animation-delay:.3s"></span>
       </div>
-      <div class="font-mono text-[11px] tracking-widest uppercase text-ink-500 dark:text-ink-400">Loading portfolio…</div>
+      <div class="font-mono text-[11px] tracking-widest uppercase text-ink-500 dark:text-ink-400">Loading…</div>
     </div>
   </div>
 
-  <!-- CURSOR -->
   <div id="cursorDot" class="cursor-dot"></div>
   <div id="cursorRing" class="cursor-ring"></div>
 
-  <!-- BG DECORATION -->
-  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-    <div class="absolute inset-0 bg-grid opacity-40 dark:opacity-20"></div>
-    <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-brand-400/20 dark:bg-brand-500/10 blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-pink-400/20 dark:bg-pink-500/10 blur-3xl animate-pulse" style="animation-delay:1.5s"></div>
-    <div class="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full bg-cyan-400/20 dark:bg-cyan-500/10 blur-3xl animate-pulse" style="animation-delay:3s"></div>
+  <div class="bg-decoration" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="bg-blob bg-blob-3"></div>
   </div>
 
-  <!-- SCROLL PROGRESS -->
   <div id="scrollProgress" class="scroll-progress"></div>
 
-  <!-- TELEGRAM FLOAT -->
   <a href="https://t.me/minsopanha" target="_blank" class="floating-btn tg-float" aria-label="Telegram">
     <i class="fa-brands fa-telegram"></i>
   </a>
 
-  <!-- AVAILABILITY -->
   <div id="availBanner" class="avail-banner">
-    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
     <div>
       Available for work
       <span class="khmer block text-xs text-ink-500 dark:text-ink-400">អាចធ្វើការបាន</span>
     </div>
   </div>
 
-  <!-- SECTION INDICATOR -->
   <div id="sectionIndicator" class="section-indicator">
     <button class="section-dot" data-section="hero" data-label="Home"></button>
     <button class="section-dot" data-section="work" data-label="Projects"></button>
@@ -111,120 +184,49 @@
     <button class="section-dot" data-section="contact" data-label="Contact"></button>
   </div>
 
-  <!-- TOAST -->
   <div id="toast" class="toast">
     <i class="fa-solid fa-circle-check text-emerald-500"></i>
     <span id="toastText">Copied!</span>
   </div>
 
-  <!-- COMMAND PALETTE -->
   <div id="cmdBackdrop" class="cmd-backdrop">
     <div class="cmd-box">
       <div class="flex items-center gap-3 px-5 py-4 border-b border-ink-200/60 dark:border-ink-800">
         <i class="fa-solid fa-magnifying-glass text-brand-500"></i>
-        <input id="cmdInput" type="text" placeholder="Type a command or search…" autocomplete="off"
+        <input id="cmdInput" type="text" placeholder="Type a command…" autocomplete="off"
                class="flex-1 bg-transparent outline-none text-ink-900 dark:text-ink-50 placeholder-ink-400">
         <kbd class="font-mono text-[10px] px-2 py-1 rounded bg-ink-100 dark:bg-ink-800 border border-ink-200 dark:border-ink-700">ESC</kbd>
       </div>
       <div id="cmdList" class="max-h-80 overflow-y-auto p-2">
-        <div class="font-mono text-[10px] font-bold tracking-widest uppercase text-ink-400 px-3 py-2">Navigation</div>
-        <button class="cmd-item" data-action="goto" data-target="#work">
-          <span class="cmd-icon"><i class="fa-solid fa-rocket"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">Projects</span>
-            <span class="block font-mono text-[10px] text-ink-400">គម្រោង · View my work</span>
-          </span>
-        </button>
-        <button class="cmd-item" data-action="goto" data-target="#code">
-          <span class="cmd-icon"><i class="fa-solid fa-code"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">Source Code</span>
-            <span class="block font-mono text-[10px] text-ink-400">មើលកូដ · Live preview</span>
-          </span>
-        </button>
-        <button class="cmd-item" data-action="goto" data-target="#about">
-          <span class="cmd-icon"><i class="fa-solid fa-user"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">About</span>
-            <span class="block font-mono text-[10px] text-ink-400">អំពី · Who I am</span>
-          </span>
-        </button>
-        <button class="cmd-item" data-action="goto" data-target="#blog">
-          <span class="cmd-icon"><i class="fa-solid fa-pen-fancy"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">Blog</span>
-            <span class="block font-mono text-[10px] text-ink-400">ប្លុក · Recent writing</span>
-          </span>
-        </button>
-        <button class="cmd-item" data-action="goto" data-target="#education">
-          <span class="cmd-icon"><i class="fa-solid fa-graduation-cap"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">Education</span>
-            <span class="block font-mono text-[10px] text-ink-400">ការសិក្សា · Where I study</span>
-          </span>
-        </button>
-        <button class="cmd-item" data-action="goto" data-target="#skills">
-          <span class="cmd-icon"><i class="fa-solid fa-layer-group"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">Skills</span>
-            <span class="block font-mono text-[10px] text-ink-400">ជំនាញ · What I know</span>
-          </span>
-        </button>
-        <button class="cmd-item" data-action="goto" data-target="#guestbook">
-          <span class="cmd-icon"><i class="fa-solid fa-book"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">Guestbook</span>
-            <span class="block font-mono text-[10px] text-ink-400">សៀវភៅភ្ញៀវ · Sign in</span>
-          </span>
-        </button>
-        <button class="cmd-item" data-action="goto" data-target="#contact">
-          <span class="cmd-icon"><i class="fa-solid fa-envelope"></i></span>
-          <span class="flex-1 text-left">
-            <span class="block font-semibold text-sm">Contact</span>
-            <span class="block font-mono text-[10px] text-ink-400">ទំនាក់ទំនង · Get in touch</span>
-          </span>
-        </button>
-
-        <div class="font-mono text-[10px] font-bold tracking-widest uppercase text-ink-400 px-3 py-2 mt-2">Actions</div>
-        <button class="cmd-item" data-action="toggle-theme">
-          <span class="cmd-icon"><i class="fa-solid fa-moon"></i></span>
-          <span class="flex-1 text-left font-semibold text-sm">Toggle theme</span>
-          <kbd class="font-mono text-[10px] px-2 py-1 rounded bg-ink-100 dark:bg-ink-800">T</kbd>
-        </button>
-        <button class="cmd-item" data-action="copy-email">
-          <span class="cmd-icon"><i class="fa-solid fa-copy"></i></span>
-          <span class="flex-1 text-left font-semibold text-sm">Copy email</span>
-        </button>
-        <button class="cmd-item" data-action="open-telegram">
-          <span class="cmd-icon"><i class="fa-brands fa-telegram"></i></span>
-          <span class="flex-1 text-left font-semibold text-sm">Open Telegram</span>
-        </button>
-        <button class="cmd-item" data-action="scroll-top">
-          <span class="cmd-icon"><i class="fa-solid fa-arrow-up"></i></span>
-          <span class="flex-1 text-left font-semibold text-sm">Scroll to top</span>
-        </button>
-      </div>
-      <div class="flex items-center gap-4 px-4 py-3 border-t border-ink-200/60 dark:border-ink-800 bg-ink-50/50 dark:bg-ink-900/50 font-mono text-[10px] text-ink-400">
-        <span><kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700">↑</kbd><kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 ml-1">↓</kbd> navigate</span>
-        <span><kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700">↵</kbd> select</span>
+        <div class="cmd-group">Navigation</div>
+        <button class="cmd-item" data-action="goto" data-target="#work"><span class="cmd-icon"><i class="fa-solid fa-rocket"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">Projects</span><span class="block font-mono text-[10px] text-ink-400">គម្រោង</span></span></button>
+        <button class="cmd-item" data-action="goto" data-target="#code"><span class="cmd-icon"><i class="fa-solid fa-code"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">Source Code</span><span class="block font-mono text-[10px] text-ink-400">មើលកូដ</span></span></button>
+        <button class="cmd-item" data-action="goto" data-target="#about"><span class="cmd-icon"><i class="fa-solid fa-user"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">About</span><span class="block font-mono text-[10px] text-ink-400">អំពី</span></span></button>
+        <button class="cmd-item" data-action="goto" data-target="#blog"><span class="cmd-icon"><i class="fa-solid fa-pen-fancy"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">Blog</span><span class="block font-mono text-[10px] text-ink-400">ប្លុក</span></span></button>
+        <button class="cmd-item" data-action="goto" data-target="#education"><span class="cmd-icon"><i class="fa-solid fa-graduation-cap"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">Education</span><span class="block font-mono text-[10px] text-ink-400">ការសិក្សា</span></span></button>
+        <button class="cmd-item" data-action="goto" data-target="#skills"><span class="cmd-icon"><i class="fa-solid fa-layer-group"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">Skills</span><span class="block font-mono text-[10px] text-ink-400">ជំនាញ</span></span></button>
+        <button class="cmd-item" data-action="goto" data-target="#guestbook"><span class="cmd-icon"><i class="fa-solid fa-book"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">Guestbook</span><span class="block font-mono text-[10px] text-ink-400">សៀវភៅ</span></span></button>
+        <button class="cmd-item" data-action="goto" data-target="#contact"><span class="cmd-icon"><i class="fa-solid fa-envelope"></i></span><span class="flex-1 text-left"><span class="block font-semibold text-sm">Contact</span><span class="block font-mono text-[10px] text-ink-400">ទំនាក់ទំនង</span></span></button>
+        <div class="cmd-group">Actions</div>
+        <button class="cmd-item" data-action="toggle-theme"><span class="cmd-icon"><i class="fa-solid fa-moon"></i></span><span class="flex-1 text-left font-semibold text-sm">Toggle theme</span></button>
+        <button class="cmd-item" data-action="copy-email"><span class="cmd-icon"><i class="fa-solid fa-copy"></i></span><span class="flex-1 text-left font-semibold text-sm">Copy email</span></button>
+        <button class="cmd-item" data-action="open-telegram"><span class="cmd-icon"><i class="fa-brands fa-telegram"></i></span><span class="flex-1 text-left font-semibold text-sm">Open Telegram</span></button>
+        <button class="cmd-item" data-action="open-dashboard"><span class="cmd-icon"><i class="fa-solid fa-chart-line"></i></span><span class="flex-1 text-left font-semibold text-sm">Open Dashboard</span></button>
+        <button class="cmd-item" data-action="scroll-top"><span class="cmd-icon"><i class="fa-solid fa-arrow-up"></i></span><span class="flex-1 text-left font-semibold text-sm">Scroll to top</span></button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL -->
   <div id="modalBackdrop" class="modal-backdrop">
     <div id="modalContent" class="modal"></div>
   </div>
 
-  <!-- HEADER -->
   <header id="header" class="header">
-    <div class="flex items-center justify-between px-5 py-3">
-      <a href="#" class="flex items-center gap-3 group">
-        <div class="logo-mark">
-          <span>M</span>
-        </div>
+    <div class="flex items-center justify-between px-4 sm:px-5 py-3">
+      <a href="#" class="flex items-center gap-2.5 group">
+        <!-- <div class="logo-mark"><span><img src="panhakh.jpg" alt=""></span></div> -->
         <div>
-          <div class="font-display font-bold text-sm text-ink-900 dark:text-white">Minsopanha<span class="text-brand-500">.</span></div>
+          <div class="font-display font-bold text-sm">Minsopanha<span class="text-brand-500">.</span></div>
           <div class="font-mono text-[9px] tracking-widest text-ink-400 uppercase">Learning · Building</div>
         </div>
       </a>
@@ -242,21 +244,20 @@
 
       <div class="flex items-center gap-2">
         <span id="liveTime" class="hidden xl:inline-block font-mono text-[11px] text-ink-500 dark:text-ink-400 px-3 py-1.5 rounded-full bg-white/70 dark:bg-ink-800/60 border border-ink-200/60 dark:border-ink-700">--:--</span>
-        <button id="cmdTrigger" class="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-ink-800/60 border border-ink-200/60 dark:border-ink-700 text-xs text-ink-500 dark:text-ink-400 hover:text-brand-500 hover:border-brand-500 transition-all font-mono">
+        <a href="dashboard.html" class="dash-link" title="Analytics Dashboard">
+          <i class="fa-solid fa-chart-line"></i>
+          <span class="txt">Dashboard</span>
+        </a>
+        <button id="cmdTrigger" class="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-ink-800/60 border border-ink-200/60 dark:border-ink-700 text-xs text-ink-500 hover:text-brand-500 transition font-mono">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Search</span>
           <kbd class="text-[10px] px-1.5 py-0.5 rounded bg-brand-500/10 text-brand-500">⌘K</kbd>
         </button>
-        <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">
-          <i id="themeIcon" class="fa-solid fa-moon"></i>
-        </button>
-        <button id="menuBtn" class="icon-btn lg:hidden" aria-label="Menu">
-          <i id="menuIcon" class="fa-solid fa-bars"></i>
-        </button>
+        <button id="themeBtn" class="icon-btn" aria-label="Toggle theme"><i id="themeIcon" class="fa-solid fa-moon"></i></button>
+        <button id="menuBtn" class="icon-btn lg:hidden" aria-label="Menu"><i id="menuIcon" class="fa-solid fa-bars"></i></button>
       </div>
     </div>
 
-    <div id="mobileMenu" class="hidden border-t border-ink-200/60 dark:border-ink-800 px-4 py-4 lg:hidden">
+    <div id="mobileMenu" class="hidden border-t border-ink-200/60 dark:border-ink-800 px-4 py-3 lg:hidden">
       <a href="#work" class="mobile-link"><span>Projects</span><span class="khmer">គម្រោង</span></a>
       <a href="#code" class="mobile-link"><span>Code</span><span class="khmer">កូដ</span></a>
       <a href="#about" class="mobile-link"><span>About</span><span class="khmer">អំពី</span></a>
@@ -265,18 +266,17 @@
       <a href="#skills" class="mobile-link"><span>Skills</span><span class="khmer">ជំនាញ</span></a>
       <a href="#guestbook" class="mobile-link"><span>Guestbook</span><span class="khmer">សៀវភៅភ្ញៀវ</span></a>
       <a href="#contact" class="mobile-link"><span>Contact</span><span class="khmer">ទំនាក់ទំនង</span></a>
-      <a href="mailto:Minsopanha@gmail.com" class="mobile-link bg-gradient-to-r from-pink-500 to-brand-500 text-white justify-center mt-2">Minsopanha@gmail.com</a>
+      <a href="dashboard.html" class="mobile-link"><span>Dashboard</span><span class="khmer">ផ្ទាំងគ្រប់គ្រង</span></a>
+      <a href="mailto:Minsopanha@gmail.com" class="mobile-mail">Minsopanha@gmail.com</a>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main class="max-w-6xl mx-auto px-6 pt-32 pb-24">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-28 sm:pt-32 pb-24">
 
-    <!-- HERO -->
-    <section id="hero" class="grid lg:grid-cols-5 gap-12 items-center py-16">
+    <section id="hero" class="grid lg:grid-cols-5 gap-10 lg:gap-12 items-center py-10 sm:py-16">
       <div class="lg:col-span-3 reveal">
         <div class="hero-badge">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
           <span class="font-mono text-xs">Open to learn · Internship · Junior roles</span>
         </div>
 
@@ -285,26 +285,23 @@
           I'm learning to build<br>
           for the web.
           <span class="khmer block text-lg sm:text-xl font-medium text-ink-500 dark:text-ink-400 mt-4 leading-relaxed">
-            សួស្តី ខ្ញុំឈ្មោះ <span class="gradient-text font-semibold">Minsopanha</span>។ ខ្ញុំកំពុងរៀនបង្កើតគេហទំព័រ។
+            សួស្តី ខ្ញុំឈ្មោះ <span class="gradient-text font-semibold">Minsopanha</span>។
           </span>
         </h1>
 
         <p class="text-base text-ink-600 dark:text-ink-300 max-w-xl mb-3">
           A beginner web developer from Phnom Penh, currently studying at
-          <strong class="text-ink-900 dark:text-white">RUPP</strong>. I'm learning
+          <strong class="text-ink-900 dark:text-white">RUPP</strong>. Learning
           <strong class="text-ink-900 dark:text-white">HTML</strong>,
           <strong class="text-ink-900 dark:text-white">CSS</strong>, and
           <strong class="text-ink-900 dark:text-white">JavaScript</strong>
           by building small projects every week.
         </p>
-        <p class="khmer text-[15px] text-ink-500 dark:text-ink-400 max-w-xl mb-6 leading-relaxed">
-          អ្នកអភិវឌ្ឍន៍វេបសាយថ្មីថ្មោងមកពីភ្នំពេញ កំពុងសិក្សានៅ <strong>សាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ (RUPP)</strong>។
-        </p>
 
         <div class="font-mono text-base text-brand-500 mb-8 flex items-center gap-1.5 h-6">
           <span class="text-ink-400">$</span>
           <span id="typingText"></span>
-          <span class="w-0.5 h-4 bg-brand-500 inline-block animate-pulse"></span>
+          <span class="w-0.5 h-4 bg-brand-500 inline-block"></span>
         </div>
 
         <div class="flex flex-wrap gap-3">
@@ -320,57 +317,37 @@
       </div>
 
       <div class="lg:col-span-2 flex justify-center items-center relative reveal">
-        <div class="hero-ring"></div>
-        <div class="hero-avatar tilt-card">
-          <div class="hero-avatar-inner">
-            <div class="font-display text-7xl font-black gradient-text leading-none">M</div>
+        <div class="hero-avatar">
+          <img style="border-radius: 150px;" src="https://i.pinimg.com/736x/32/51/18/32511816a2e7ab6a650a5d96788920da.jpg" alt="">
+          <!-- <div class="hero-avatar-inner">
+            <div class="font-display text-7xl font-black gradient-text leading-none"></div>
             <div class="font-mono text-[10px] tracking-widest uppercase text-ink-500 dark:text-ink-400 mt-2 text-center">
               Web Learner
               <span class="khmer block text-[11px] tracking-normal mt-0.5">អ្នករៀនវេប</span>
             </div>
-          </div>
+          </div> -->
         </div>
-        <div class="hero-float-badge" style="top:10%;right:-10px">
-          <i class="fa-solid fa-graduation-cap"></i>
-          <span>RUPP</span>
+        <div class="hero-float-badge" style="top:8%;right:-5px">
+          <i class="fa-solid fa-graduation-cap"></i><span>RUPP</span>
         </div>
-        <div class="hero-float-badge" style="bottom:10%;left:-20px">
-          <i class="fa-solid fa-code"></i>
-          <span>HTML·CSS·JS</span>
+        <div class="hero-float-badge" style="bottom:8%;left:-10px">
+          <i class="fa-solid fa-code"></i><span>HTML·CSS·JS</span>
         </div>
       </div>
     </section>
 
-    <!-- STATS -->
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 my-16 reveal">
-      <div class="stat-card tilt-card">
-        <div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-        <div class="stat-num" data-count="1">0</div>
-        <div class="stat-lbl">University<span class="khmer">សាកលវិទ្យាល័យ</span></div>
-      </div>
-      <div class="stat-card tilt-card">
-        <div class="stat-icon"><i class="fa-solid fa-code"></i></div>
-        <div class="stat-num" data-count="3">0</div>
-        <div class="stat-lbl">Languages<span class="khmer">ភាសា</span></div>
-      </div>
-      <div class="stat-card tilt-card">
-        <div class="stat-icon"><i class="fa-solid fa-rocket"></i></div>
-        <div class="stat-num" data-count="3">0</div>
-        <div class="stat-lbl">Projects<span class="khmer">គម្រោង</span></div>
-      </div>
-      <div class="stat-card tilt-card">
-        <div class="stat-icon"><i class="fa-solid fa-heart"></i></div>
-        <div class="stat-num" data-count="100" data-suffix="%">0</div>
-        <div class="stat-lbl">Honest<span class="khmer">ស្មោះត្រង់</span></div>
-      </div>
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 my-12 sm:my-16 reveal">
+      <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div><div class="stat-num" data-count="1">0</div><div class="stat-lbl">University<span class="khmer">សាកលវិទ្យាល័យ</span></div></div>
+      <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-code"></i></div><div class="stat-num" data-count="3">0</div><div class="stat-lbl">Languages<span class="khmer">ភាសា</span></div></div>
+      <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-rocket"></i></div><div class="stat-num" data-count="3">0</div><div class="stat-lbl">Projects<span class="khmer">គម្រោង</span></div></div>
+      <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-heart"></i></div><div class="stat-num" data-count="100" data-suffix="%">0</div><div class="stat-lbl">Honest<span class="khmer">ស្មោះត្រង់</span></div></div>
     </section>
 
-    <!-- CAROUSEL -->
-    <section class="my-16 reveal">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <section class="my-12 sm:my-16 reveal">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div class="flex items-center gap-3">
           <span class="carousel-badge"><i class="fa-solid fa-star mr-1"></i> For clients</span>
-          <span class="font-display text-lg font-bold">Featured work · <span class="khmer font-medium text-ink-500 dark:text-ink-400">ស្នាដៃពិសេស</span></span>
+          <span class="font-display text-base sm:text-lg font-bold">Featured work</span>
         </div>
         <div class="flex gap-2">
           <button id="carouselPrev" class="carousel-btn"><i class="fa-solid fa-arrow-left"></i></button>
@@ -380,76 +357,49 @@
 
       <div id="carouselViewport" class="carousel-viewport">
         <div id="carouselTrack" class="carousel-track">
-          <!-- Slide 1 -->
           <div class="carousel-slide">
             <div class="carousel-preview">
               <div class="mock-window">
-                <div class="mock-bar">
-                  <span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span>
-                  <span class="mock-url">todo.app</span>
-                </div>
-                <div class="mock-body">
-                  <div class="mock-line w-60"></div>
-                  <div class="mock-block"><i class="fa-solid fa-list-check"></i></div>
-                  <div class="mock-line w-90"></div>
-                  <div class="mock-line w-75"></div>
-                </div>
+                <div class="mock-bar"><span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span><span class="mock-url">todo.app</span></div>
+                <div class="mock-body"><div class="mock-line w-60"></div><div class="mock-block"><i class="fa-solid fa-list-check"><img src="https://i.pinimg.com/736x/58/4f/f5/584ff582817f53a0c6772db407312fea.jpg" alt="">
+              <div class="carousel-num">PROJECT · 001</div></i></div><div class="mock-line w-90"></div><div class="mock-line w-75"></div></div>
               </div>
             </div>
             <div class="carousel-body">
-              <div class="carousel-num">PROJECT · 001</div>
               <h3 class="carousel-title">To-Do List <span class="khmer block text-base font-medium text-ink-500 dark:text-ink-400 mt-1">បញ្ជីការងារត្រូវធ្វើ</span></h3>
-              <p class="carousel-desc">A simple, focused task manager. Add, check off, and delete tasks — all saved in your browser with localStorage.</p>
+              <p class="carousel-desc">A simple, focused task manager. Add, check off, and delete tasks — all saved with localStorage.</p>
               <div class="carousel-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>localStorage</span></div>
               <button class="carousel-cta" data-project="todo">View details <i class="fa-solid fa-arrow-right"></i></button>
             </div>
           </div>
 
-          <!-- Slide 2 -->
           <div class="carousel-slide">
             <div class="carousel-preview">
               <div class="mock-window">
-                <div class="mock-bar">
-                  <span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span>
-                  <span class="mock-url">calc.app</span>
-                </div>
-                <div class="mock-body">
-                  <div class="mock-line w-50"></div>
-                  <div class="mock-block"><i class="fa-solid fa-calculator"></i></div>
-                  <div class="mock-line w-75"></div>
-                  <div class="mock-line w-90"></div>
-                </div>
+                <div class="mock-bar"><span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span><span class="mock-url">calc.app</span></div>
+                <div class="mock-body"><div class="mock-line w-50"></div><div class="mock-block"><i class="fa-solid fa-calculator"><img src="https://i.pinimg.com/736x/c1/d8/af/c1d8af8a54403ed2ad9737b56e44ddad.jpg" alt=""></i></div><div class="mock-line w-75"></div><div class="mock-line w-90"></div></div>
               </div>
             </div>
             <div class="carousel-body">
               <div class="carousel-num">PROJECT · 002</div>
               <h3 class="carousel-title">Calculator <span class="khmer block text-base font-medium text-ink-500 dark:text-ink-400 mt-1">ម៉ាស៊ីនគិតលេខ</span></h3>
-              <p class="carousel-desc">My first UI project. Handles arithmetic with a clean layout, keyboard support, and careful edge-case handling.</p>
+              <p class="carousel-desc">My first UI project. Handles arithmetic with a clean layout, keyboard support, and careful edge cases.</p>
               <div class="carousel-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
               <button class="carousel-cta" data-project="calc">View details <i class="fa-solid fa-arrow-right"></i></button>
             </div>
           </div>
 
-          <!-- Slide 3 -->
           <div class="carousel-slide">
             <div class="carousel-preview">
               <div class="mock-window">
-                <div class="mock-bar">
-                  <span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span>
-                  <span class="mock-url">weather.app</span>
-                </div>
-                <div class="mock-body">
-                  <div class="mock-line w-90"></div>
-                  <div class="mock-block"><i class="fa-solid fa-cloud-sun"></i></div>
-                  <div class="mock-line w-50"></div>
-                  <div class="mock-line w-75"></div>
-                </div>
+                <div class="mock-bar"><span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span><span class="mock-url">weather.app</span></div>
+                <div class="mock-body"><div class="mock-line w-90"></div><div class="mock-block"><i class="fa-solid fa-cloud-sun"><img src="https://i.pinimg.com/736x/55/91/f8/5591f8b8fb3eb46e04f9f9e38e14860b.jpg" alt=""></i></div><div class="mock-line w-50"></div><div class="mock-line w-75"></div></div>
               </div>
             </div>
             <div class="carousel-body">
               <div class="carousel-num">PROJECT · 003</div>
               <h3 class="carousel-title">Weather App <span class="khmer block text-base font-medium text-ink-500 dark:text-ink-400 mt-1">កម្មវិធីអាកាសធាតុ</span></h3>
-              <p class="carousel-desc">Search any city and see the current weather. First project calling a real API with fetch and async/await.</p>
+              <p class="carousel-desc">Search any city and see the current weather. First project calling a real API with fetch + async/await.</p>
               <div class="carousel-tags"><span>JavaScript</span><span>Fetch API</span><span>CSS</span></div>
               <button class="carousel-cta" data-project="weather">View details <i class="fa-solid fa-arrow-right"></i></button>
             </div>
@@ -457,78 +407,33 @@
         </div>
       </div>
 
-      <div id="carouselDots" class="flex justify-center gap-2 mt-6"></div>
+      <div id="carouselDots" class="flex justify-center gap-2 mt-5"></div>
       <div class="h-1 bg-ink-200 dark:bg-ink-800 rounded-full mt-4 overflow-hidden">
-        <div id="carouselProgress" class="h-full bg-gradient-to-r from-brand-500 via-pink-500 to-cyan-500 bg-[length:200%_100%] animate-gradient-x" style="width:33%"></div>
+        <div id="carouselProgress" class="carousel-progress-bar" style="width:33%"></div>
       </div>
     </section>
 
-    <!-- MARQUEE -->
-    <div class="marquee reveal" aria-hidden="true">
-      <div class="marquee-track">
-        <span class="marquee-item"><i class="fa-solid fa-code"></i> HTML5</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-solid fa-palette"></i> CSS3</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-js"></i> JavaScript</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-tailwind"></i> Tailwind</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-git-alt"></i> Git</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-github"></i> GitHub</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-solid fa-mobile-screen"></i> Responsive</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-solid fa-graduation-cap"></i> RUPP <span class="khmer">សាកលវិទ្យាល័យ</span></span>
-        <span class="marquee-dot"></span>
-        <!-- duplicates -->
-        <span class="marquee-item"><i class="fa-solid fa-code"></i> HTML5</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-solid fa-palette"></i> CSS3</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-js"></i> JavaScript</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-tailwind"></i> Tailwind</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-git-alt"></i> Git</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-brands fa-github"></i> GitHub</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-solid fa-mobile-screen"></i> Responsive</span>
-        <span class="marquee-dot"></span>
-        <span class="marquee-item"><i class="fa-solid fa-graduation-cap"></i> RUPP <span class="khmer">សាកលវិទ្យាល័យ</span></span>
-        <span class="marquee-dot"></span>
-      </div>
-    </div>
-
-    <!-- PROJECTS -->
-    <section id="work" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
-      <div class="mb-12">
+    <section id="work" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+      <div class="mb-10">
         <span class="section-label">Projects · 01</span>
-        <h2 class="section-title">Things I've built <span class="khmer block text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">អ្វីដែលខ្ញុំបានបង្កើត</span></h2>
-        <p class="text-ink-500 dark:text-ink-400 mt-2">Small projects from my learning journey. Click any card for details.</p>
+        <h2 class="section-title">Things I've built <span class="khmer block text-lg sm:text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">អ្វីដែលខ្ញុំបានបង្កើត</span></h2>
+        <p class="text-ink-500 dark:text-ink-400 mt-2 text-sm">Small projects from my learning journey.</p>
       </div>
 
-      <div id="filterBar" class="flex flex-wrap gap-2 mb-7">
-        <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-layer-group"></i> All <span class="filter-count">3</span></button>
+      <div id="filterBar" class="flex flex-wrap gap-2 mb-6">
+        <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-layer-group"></i> All</button>
         <button class="filter-btn" data-filter="html"><i class="fa-brands fa-html5"></i> HTML</button>
         <button class="filter-btn" data-filter="css"><i class="fa-brands fa-css3-alt"></i> CSS</button>
-        <button class="filter-btn" data-filter="javascript"><i class="fa-brands fa-js"></i> JavaScript</button>
+        <button class="filter-btn" data-filter="javascript"><i class="fa-brands fa-js"></i> JS</button>
         <button class="filter-btn" data-filter="api"><i class="fa-solid fa-cloud"></i> API</button>
       </div>
 
-      <div id="projectList" class="flex flex-col gap-5">
-        <article class="project-card tilt-card" data-tags="html css javascript localStorage" data-project="todo">
+      <div id="projectList" class="flex flex-col gap-4 sm:gap-5">
+        <article class="project-card" data-tags="html css javascript localStorage" data-project="todo">
           <div class="project-preview">
             <div class="mock-window">
               <div class="mock-bar"><span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span><span class="mock-url">todo.app</span></div>
-              <div class="mock-body">
-                <div class="mock-line w-60"></div>
-                <div class="mock-block"><i class="fa-solid fa-list-check"></i></div>
-                <div class="mock-line w-90"></div>
-                <div class="mock-line w-75"></div>
-              </div>
+              <div class="mock-body"><div class="mock-line w-60"></div><div class="mock-block"><i class="fa-solid fa-list-check"></i></div><div class="mock-line w-90"></div><div class="mock-line w-75"></div></div>
             </div>
           </div>
           <div class="project-body">
@@ -540,16 +445,11 @@
           </div>
         </article>
 
-        <article class="project-card tilt-card" data-tags="html css javascript" data-project="calc">
+        <article class="project-card" data-tags="html css javascript" data-project="calc">
           <div class="project-preview">
             <div class="mock-window">
               <div class="mock-bar"><span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span><span class="mock-url">calc.app</span></div>
-              <div class="mock-body">
-                <div class="mock-line w-50"></div>
-                <div class="mock-block"><i class="fa-solid fa-calculator"></i></div>
-                <div class="mock-line w-75"></div>
-                <div class="mock-line w-90"></div>
-              </div>
+              <div class="mock-body"><div class="mock-line w-50"></div><div class="mock-block"><i class="fa-solid fa-calculator"></i></div><div class="mock-line w-75"></div><div class="mock-line w-90"></div></div>
             </div>
           </div>
           <div class="project-body">
@@ -561,16 +461,11 @@
           </div>
         </article>
 
-        <article class="project-card tilt-card" data-tags="javascript css api fetch" data-project="weather">
+        <article class="project-card" data-tags="javascript css api fetch" data-project="weather">
           <div class="project-preview">
             <div class="mock-window">
               <div class="mock-bar"><span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span><span class="mock-url">weather.app</span></div>
-              <div class="mock-body">
-                <div class="mock-line w-90"></div>
-                <div class="mock-block"><i class="fa-solid fa-cloud-sun"></i></div>
-                <div class="mock-line w-50"></div>
-                <div class="mock-line w-75"></div>
-              </div>
+              <div class="mock-body"><div class="mock-line w-90"></div><div class="mock-block"><i class="fa-solid fa-cloud-sun"></i></div><div class="mock-line w-50"></div><div class="mock-line w-75"></div></div>
             </div>
           </div>
           <div class="project-body">
@@ -584,15 +479,14 @@
       </div>
     </section>
 
-    <!-- CODE SHOWCASE -->
-    <section id="code" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+    <section id="code" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
       <div class="mb-10">
         <span class="section-label">Source Code · 02</span>
-        <h2 class="section-title">Behind the scenes <span class="khmer block text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">ពីក្រោយឆាក</span></h2>
-        <p class="text-ink-500 dark:text-ink-400 mt-2">Real snippets from the projects above. Click tabs to switch files.</p>
+        <h2 class="section-title">Behind the scenes <span class="khmer block text-lg sm:text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">ពីក្រោយឆាក</span></h2>
+        <p class="text-ink-500 dark:text-ink-400 mt-2 text-sm">Real snippets from the projects above.</p>
       </div>
 
-      <div class="code-panel tilt-card">
+      <div class="code-panel">
         <div class="code-head">
           <div class="flex items-center gap-3">
             <div class="flex gap-1.5">
@@ -600,12 +494,9 @@
               <span class="w-3 h-3 rounded-full bg-amber-400"></span>
               <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
             </div>
-            <span class="font-mono text-xs text-ink-500 dark:text-ink-400" id="codeFilename">main.js</span>
+            <span class="font-mono text-xs text-ink-500 dark:text-ink-400" id="codeFilename">todo.js</span>
           </div>
-          <div class="flex gap-2">
-            <button class="code-action" id="codeCopyBtn"><i class="fa-regular fa-copy mr-1"></i> Copy</button>
-            <button class="code-action" id="codeWrapBtn"><i class="fa-solid fa-text-width"></i></button>
-          </div>
+          <button class="code-action" id="codeCopyBtn"><i class="fa-regular fa-copy mr-1"></i> Copy</button>
         </div>
 
         <div id="codeTabs" class="code-tabs">
@@ -616,123 +507,120 @@
         </div>
 
         <div class="code-body">
-          <pre id="codeBlock" class="code-block"><code class="code-content"></code></pre>
+          <pre id="codeBlock" class="code-block"></pre>
         </div>
       </div>
     </section>
 
-    <!-- ABOUT -->
-    <section id="about" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
-      <div class="grid lg:grid-cols-5 gap-12">
+    <section id="about" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+      <div class="grid lg:grid-cols-5 gap-10 lg:gap-12">
         <div class="lg:col-span-3">
           <span class="section-label">About · 03</span>
-          <h2 class="section-title mb-6">A beginner with a plan. <span class="khmer block text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">អ្នកចាប់ផ្តើមដែលមានផែនការ។</span></h2>
+          <h2 class="section-title mb-6">A beginner with a plan. <span class="khmer block text-lg sm:text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">អ្នកចាប់ផ្តើមដែលមានផែនការ។</span></h2>
 
           <p class="text-ink-600 dark:text-ink-300 mb-4">I started learning web development recently. No bootcamp, no CS degree — just curiosity, free tutorials, and a lot of practice.</p>
-          <p class="khmer text-[15px] text-ink-500 dark:text-ink-400 mb-4 leading-relaxed">ខ្ញុំបានចាប់ផ្តើមរៀនអភិវឌ្ឍន៍វេបសាយថ្មីៗនេះ។ គ្មាន bootcamp គ្មានសញ្ញាបត្រ — គ្រាន់តែចង់ដឹង និងការអនុវត្តច្រើន។</p>
-          <p class="text-ink-600 dark:text-ink-300 mb-4">My goal is simple: get good enough to build real projects for real people. Currently focusing on fundamentals — clean HTML, styling with CSS, and interactivity with JavaScript.</p>
+          <p class="khmer text-[15px] text-ink-500 dark:text-ink-400 mb-4 leading-relaxed">ខ្ញុំបានចាប់ផ្តើមរៀនអភិវឌ្ឍន៍វេបសាយថ្មីៗនេះ។</p>
+          <p class="text-ink-600 dark:text-ink-300 mb-4">My goal is simple: get good enough to build real projects for real people.</p>
 
           <div class="mt-8">
-            <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-ink-400 mb-4">// REACH ME · ទាក់ទងខ្ញុំ</div>
+            <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-ink-400 mb-4">// REACH ME</div>
 
             <a href="mailto:Minsopanha@gmail.com" class="contact-row">
               <span class="contact-icon mail"><i class="fa-regular fa-envelope"></i></span>
               <div class="flex-1 min-w-0">
-                <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400">Email · អ៊ីមែល</div>
+                <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400">Email</div>
                 <div class="font-semibold text-sm truncate">Minsopanha@gmail.com</div>
               </div>
-              <button class="copy-btn" data-copy="Minsopanha@gmail.com" aria-label="Copy"><i class="fa-regular fa-copy"></i></button>
+              <button class="copy-btn" data-copy="Minsopanha@gmail.com"><i class="fa-regular fa-copy"></i></button>
             </a>
 
             <a href="https://t.me/minsopanha" target="_blank" class="contact-row">
               <span class="contact-icon tg"><i class="fa-brands fa-telegram"></i></span>
               <div class="flex-1 min-w-0">
-                <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400">Telegram · តេឡេក្រាម</div>
+                <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400">Telegram</div>
                 <div class="font-semibold text-sm truncate">@minsopanha</div>
               </div>
-              <button class="copy-btn" data-copy="@minsopanha" aria-label="Copy"><i class="fa-regular fa-copy"></i></button>
+              <button class="copy-btn" data-copy="@minsopanha"><i class="fa-regular fa-copy"></i></button>
             </a>
           </div>
         </div>
 
         <aside class="lg:col-span-2 flex flex-col gap-4">
-          <div class="info-card tilt-card">
+          <div class="info-card">
             <div class="info-icon"><i class="fa-solid fa-graduation-cap"></i></div>
             <div class="font-mono text-[10px] font-bold tracking-widest uppercase text-ink-400 mb-1">Currently learning</div>
             <div class="font-semibold text-sm">HTML · CSS · JavaScript</div>
           </div>
-          <div class="info-card tilt-card">
+          <div class="info-card">
             <div class="info-icon"><i class="fa-solid fa-map-pin"></i></div>
             <div class="font-mono text-[10px] font-bold tracking-widest uppercase text-ink-400 mb-1">Based in</div>
             <div class="font-semibold text-sm">Phnom Penh, Cambodia<span class="khmer block text-[13px] font-medium text-ink-500 dark:text-ink-400 mt-0.5">ភ្នំពេញ កម្ពុជា</span></div>
           </div>
-          <div class="info-card tilt-card">
+          <div class="info-card">
             <div class="info-icon"><i class="fa-solid fa-clock"></i></div>
             <div class="font-mono text-[10px] font-bold tracking-widest uppercase text-ink-400 mb-1">Availability</div>
-            <div class="font-semibold text-sm">Open to internships & junior roles<span class="khmer block text-[13px] font-medium text-ink-500 dark:text-ink-400 mt-0.5">បើកចំហសម្រាប់កម្មសិក្សា</span></div>
+            <div class="font-semibold text-sm">Open to internships<span class="khmer block text-[13px] font-medium text-ink-500 dark:text-ink-400 mt-0.5">បើកចំហសម្រាប់កម្មសិក្សា</span></div>
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- BLOG -->
-    <section id="blog" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+    <section id="blog" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
       <span class="section-label">Blog · 04</span>
-      <h2 class="section-title">Recent writing <span class="khmer block text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">ការសរសេរថ្មីៗ</span></h2>
-      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8">Notes from my learning journey.</p>
+      <h2 class="section-title">Recent writing <span class="khmer block text-lg sm:text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">ការសរសេរថ្មីៗ</span></h2>
+      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8 text-sm">Notes from my learning journey.</p>
 
-      <div class="grid md:grid-cols-3 gap-5">
-        <article class="blog-card tilt-card">
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+        <article class="blog-card">
           <div class="blog-thumb"><i class="fa-solid fa-cube"></i></div>
           <div class="p-5 flex-1 flex flex-col">
-            <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-2">Mar 2025 · 5 min read</div>
-            <h3 class="font-display font-bold text-base leading-snug mb-2">Why I chose vanilla JS first <span class="khmer block text-sm font-medium text-ink-500 dark:text-ink-400 mt-1">ហេតុអ្វីខ្ញុំជ្រើសរើស JS សុទ្ធ</span></h3>
-            <p class="text-sm text-ink-500 dark:text-ink-400 mb-4 flex-1">Frameworks come and go — but understanding the language itself is forever.</p>
+            <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-2">Mar 2025 · 5 min</div>
+            <h3 class="font-display font-bold text-base leading-snug mb-2">Why I chose vanilla JS first</h3>
+            <p class="text-sm text-ink-500 dark:text-ink-400 mb-4 flex-1">Frameworks come and go — but understanding the language is forever.</p>
             <span class="blog-link">Read more <i class="fa-solid fa-arrow-right"></i></span>
           </div>
         </article>
 
-        <article class="blog-card tilt-card">
+        <article class="blog-card">
           <div class="blog-thumb"><i class="fa-solid fa-mobile-screen"></i></div>
           <div class="p-5 flex-1 flex flex-col">
-            <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-2">Feb 2025 · 4 min read</div>
-            <h3 class="font-display font-bold text-base leading-snug mb-2">Mobile-first CSS lessons <span class="khmer block text-sm font-medium text-ink-500 dark:text-ink-400 mt-1">CSS មុនពេលទូរស័ព្ទ</span></h3>
-            <p class="text-sm text-ink-500 dark:text-ink-400 mb-4 flex-1">Writing styles from the smallest screen up changed how I think about layout.</p>
+            <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-2">Feb 2025 · 4 min</div>
+            <h3 class="font-display font-bold text-base leading-snug mb-2">Mobile-first CSS lessons</h3>
+            <p class="text-sm text-ink-500 dark:text-ink-400 mb-4 flex-1">Writing styles from the smallest screen up changed everything.</p>
             <span class="blog-link">Read more <i class="fa-solid fa-arrow-right"></i></span>
           </div>
         </article>
 
-        <article class="blog-card tilt-card">
+        <article class="blog-card">
           <div class="blog-thumb"><i class="fa-solid fa-lightbulb"></i></div>
           <div class="p-5 flex-1 flex flex-col">
-            <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-2">Jan 2025 · 6 min read</div>
-            <h3 class="font-display font-bold text-base leading-snug mb-2">Building in public <span class="khmer block text-sm font-medium text-ink-500 dark:text-ink-400 mt-1">ការសាងសង់ជាសាធារណៈ</span></h3>
-            <p class="text-sm text-ink-500 dark:text-ink-400 mb-4 flex-1">Sharing unfinished work online is scary. But the feedback loop is unbeatable.</p>
+            <div class="font-mono text-[10px] tracking-widest uppercase text-ink-400 mb-2">Jan 2025 · 6 min</div>
+            <h3 class="font-display font-bold text-base leading-snug mb-2">Building in public</h3>
+            <p class="text-sm text-ink-500 dark:text-ink-400 mb-4 flex-1">Sharing unfinished work online is scary. But the feedback loop rocks.</p>
             <span class="blog-link">Read more <i class="fa-solid fa-arrow-right"></i></span>
           </div>
         </article>
       </div>
     </section>
 
-    <!-- EDUCATION -->
-    <section id="education" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+    <section id="education" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
       <span class="section-label">Education · 05</span>
-      <h2 class="section-title">Where I study <span class="khmer block text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">កន្លែងដែលខ្ញុំសិក្សា</span></h2>
-      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8">My academic background so far.</p>
+      <h2 class="section-title">Where I study <span class="khmer block text-lg sm:text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">កន្លែងដែលខ្ញុំសិក្សា</span></h2>
+      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8 text-sm">My academic background so far.</p>
 
-      <div class="relative pl-10">
-        <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gradient-to-b from-brand-500 via-pink-500 to-cyan-500 rounded"></div>
+      <div class="relative pl-8 sm:pl-10">
+        <div class="edu-line"></div>
 
-        <div class="edu-item tilt-card">
-          <div class="flex gap-5 mb-4">
+        <div class="edu-item">
+          <div class="flex gap-4 mb-4">
             <div class="edu-logo"><i class="fa-solid fa-university"></i></div>
             <div>
-              <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-brand-500 mb-1.5">Present · Ongoing · បច្ចុប្បន្ន</div>
-              <h3 class="font-display font-bold text-xl">Royal University of Phnom Penh <span class="khmer block text-base font-medium text-ink-500 dark:text-ink-400 mt-1">សាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ</span></h3>
+              <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-brand-500 mb-1.5">Present · Ongoing</div>
+              <h3 class="font-display font-bold text-lg sm:text-xl">Royal University of Phnom Penh <span class="khmer block text-sm sm:text-base font-medium text-ink-500 dark:text-ink-400 mt-1">សាកលវិទ្យាល័យភូមិន្ទភ្នំពេញ</span></h3>
               <p class="text-sm text-ink-500 dark:text-ink-400 mt-1">RUPP · Phnom Penh, Cambodia</p>
             </div>
           </div>
-          <p class="text-sm text-ink-500 dark:text-ink-400 leading-relaxed">Studying at RUPP while learning web development on my own. Combining university coursework with hands-on practice in HTML, CSS, and JavaScript — building small real projects each week.</p>
+          <p class="text-sm text-ink-500 dark:text-ink-400 leading-relaxed">Studying at RUPP while learning web development on my own. Combining university coursework with hands-on practice in HTML, CSS, and JavaScript.</p>
           <div class="flex flex-wrap gap-2 mt-4">
             <span class="edu-tag">RUPP</span>
             <span class="edu-tag">Phnom Penh</span>
@@ -742,113 +630,107 @@
       </div>
     </section>
 
-    <!-- SKILLS -->
-    <section id="skills" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+    <section id="skills" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
       <span class="section-label">Skills · 06</span>
-      <h2 class="section-title">What I know so far <span class="khmer block text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">អ្វីដែលខ្ញុំដឹង</span></h2>
-      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8">Honest levels — I'm still learning every day.</p>
+      <h2 class="section-title">What I know so far <span class="khmer block text-lg sm:text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">អ្វីដែលខ្ញុំដឹង</span></h2>
+      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8 text-sm">Honest levels — I'm still learning every day.</p>
 
       <div class="max-w-2xl flex flex-col gap-5">
         <div class="skill">
           <div class="flex justify-between mb-2 text-sm">
             <span class="font-semibold">HTML</span>
-            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Comfortable <span class="khmer">ស្រួល</span></span>
+            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Comfortable</span>
           </div>
           <div class="skill-bar"><div class="skill-fill" style="--w:75%"></div></div>
         </div>
         <div class="skill">
           <div class="flex justify-between mb-2 text-sm">
             <span class="font-semibold">CSS</span>
-            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Getting there <span class="khmer">កំពុងរីកចម្រើន</span></span>
+            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Getting there</span>
           </div>
           <div class="skill-bar"><div class="skill-fill" style="--w:65%"></div></div>
         </div>
         <div class="skill">
           <div class="flex justify-between mb-2 text-sm">
             <span class="font-semibold">JavaScript</span>
-            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Learning <span class="khmer">កំពុងរៀន</span></span>
+            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Learning</span>
           </div>
           <div class="skill-bar"><div class="skill-fill" style="--w:45%"></div></div>
         </div>
         <div class="skill">
           <div class="flex justify-between mb-2 text-sm">
             <span class="font-semibold">Git & GitHub</span>
-            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Basics <span class="khmer">មូលដ្ឋាន</span></span>
+            <span class="font-mono text-xs text-ink-500 dark:text-ink-400">Basics</span>
           </div>
           <div class="skill-bar"><div class="skill-fill" style="--w:40%"></div></div>
         </div>
       </div>
     </section>
 
-    <!-- GUESTBOOK -->
-    <section id="guestbook" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+    <section id="guestbook" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
       <span class="section-label">Guestbook · 07</span>
-      <h2 class="section-title">Sign my guestbook <span class="khmer block text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">ចុះហត្ថលេខា</span></h2>
-      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8">Leave a short message — it stays in your browser.</p>
+      <h2 class="section-title">Sign my guestbook <span class="khmer block text-lg sm:text-xl text-ink-500 dark:text-ink-400 mt-1.5 font-medium">ចុះហត្ថលេខា</span></h2>
+      <p class="text-ink-500 dark:text-ink-400 mt-2 mb-8 text-sm">Leave a short message — it stays in your browser.</p>
 
       <form id="guestbookForm" class="guestbook-form" autocomplete="off">
-        <input id="gbName" type="text" maxlength="40" required placeholder="Your name · ឈ្មោះរបស់អ្នក" class="gb-input">
-        <textarea id="gbMessage" maxlength="280" required placeholder="Your message · សាររបស់អ្នក" class="gb-input resize-y min-h-[80px]"></textarea>
+        <input id="gbName" type="text" maxlength="40" required placeholder="Your name · ឈ្មោះ" class="gb-input">
+        <textarea id="gbMessage" maxlength="280" required placeholder="Your message · សារ" class="gb-input" style="min-height:80px;resize:vertical"></textarea>
         <div class="flex justify-between items-center flex-wrap gap-3">
           <span id="gbCount" class="font-mono text-[10px] text-ink-500 dark:text-ink-400">0 / 280</span>
           <button type="submit" class="btn-primary">Sign <i class="fa-solid fa-pen-nib"></i></button>
         </div>
       </form>
 
-      <div id="guestbookList" class="flex flex-col gap-3 mt-7"></div>
+      <div id="guestbookList" class="flex flex-col gap-3 mt-6"></div>
     </section>
 
-    <!-- CONTACT -->
-    <section id="contact" class="py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
-      <div class="cta-panel tilt-card">
-        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur font-mono text-[11px] mb-6 relative z-10">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+    <section id="contact" class="py-16 sm:py-20 border-t border-ink-200/60 dark:border-ink-800 reveal">
+      <div class="cta-panel">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 font-mono text-[11px] mb-6 relative z-10">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
           Open to opportunities · បើកចំហ
         </span>
         <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 relative z-10">
           Let's talk.
           <span class="khmer block text-xl sm:text-2xl text-brand-200 mt-2 font-medium">តោះនិយាយគ្នា។</span>
         </h2>
-        <p class="text-brand-100/90 max-w-lg mx-auto mb-8 relative z-10">Whether you have advice, a small project, or just want to say hi — I'd love to hear from you.</p>
+        <p class="text-brand-100/90 max-w-lg mx-auto mb-8 relative z-10 text-sm sm:text-base">Whether you have advice, a small project, or just want to say hi — I'd love to hear from you.</p>
 
         <div class="grid sm:grid-cols-2 gap-3 max-w-2xl mx-auto relative z-10">
           <a href="mailto:Minsopanha@gmail.com" class="cta-card">
             <span class="cta-icon mail"><i class="fa-regular fa-envelope"></i></span>
             <div class="flex-1 text-left min-w-0">
-              <div class="font-mono text-[10px] tracking-widest uppercase text-white/60">Email · អ៊ីមែល</div>
+              <div class="font-mono text-[10px] tracking-widest uppercase text-white/60">Email</div>
               <div class="font-semibold text-sm truncate">Minsopanha@gmail.com</div>
             </div>
-            <i class="fa-solid fa-arrow-right text-white/40 group-hover:text-white transition"></i>
+            <i class="fa-solid fa-arrow-right text-white/40"></i>
           </a>
           <a href="https://t.me/minsopanha" target="_blank" class="cta-card">
             <span class="cta-icon tg"><i class="fa-brands fa-telegram"></i></span>
             <div class="flex-1 text-left min-w-0">
-              <div class="font-mono text-[10px] tracking-widest uppercase text-white/60">Telegram · តេឡេក្រាម</div>
+              <div class="font-mono text-[10px] tracking-widest uppercase text-white/60">Telegram</div>
               <div class="font-semibold text-sm truncate">@minsopanha</div>
             </div>
-            <i class="fa-solid fa-arrow-right text-white/40 group-hover:text-white transition"></i>
+            <i class="fa-solid fa-arrow-right text-white/40"></i>
           </a>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- FOOTER -->
   <footer class="border-t border-ink-200/60 dark:border-ink-800 py-8">
-    <div class="max-w-6xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4 text-sm text-ink-500 dark:text-ink-400">
-      <p>© <span id="year"></span> Minsopanha · Built while learning at RUPP</p>
-      <p class="khmer">© <span id="yearKh"></span> Minsopanha · សាងសង់ខណៈពេលរៀននៅ RUPP</p>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-wrap justify-between items-center gap-3 text-xs sm:text-sm text-ink-500 dark:text-ink-400">
+      <p>© <span id="year"></span> Minsopanha · Learning at RUPP</p>
       <div class="flex gap-5">
         <a href="mailto:Minsopanha@gmail.com" class="hover:text-brand-500 transition">Email</a>
         <a href="https://t.me/minsopanha" target="_blank" class="hover:text-brand-500 transition">Telegram</a>
+        <a href="dashboard.html" class="hover:text-brand-500 transition">Dashboard</a>
       </div>
     </div>
   </footer>
 
-  <button id="scrollTop" class="scroll-top" aria-label="Scroll top">
-    <i class="fa-solid fa-arrow-up"></i>
-  </button>
+  <button id="scrollTop" class="scroll-top" aria-label="Scroll top"><i class="fa-solid fa-arrow-up"></i></button>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>

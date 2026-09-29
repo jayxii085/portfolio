@@ -1,36 +1,67 @@
 /* ============================================================
-   MINSOPANHA PORTFOLIO — JAVASCRIPT
+   MINSOPANHA PORTFOLIO — CROSS-DEVICE JAVASCRIPT
    ============================================================ */
 (function () {
   'use strict';
 
+  /* ============ PRO DEVICE DETECTION & CLASSES ============ */
+  const ua = navigator.userAgent;
+  const htmlEl = document.documentElement;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(ua);
+  const isTablet = /iPad|Tablet/i.test(ua) || (isAndroid && !/Mobile/i.test(ua));
+  const isPhone = !isTablet && (/iPhone|iPod|Android.*Mobile|Mobile/i.test(ua));
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1025px)').matches;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = !isDesktop;
+
+  htmlEl.classList.add('is-' + (isIOS ? 'ios' : isAndroid ? 'android' : isTablet ? 'tablet' : isDesktop ? 'desktop' : 'mobile'));
+  if (hasTouch) htmlEl.classList.add('has-touch');
+  if (isPhone) htmlEl.classList.add('is-phone');
+  if (isTablet) htmlEl.classList.add('is-tablet');
+  if (isDesktop) htmlEl.classList.add('is-desktop');
+
+  function setVH() {
+    document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+  }
+  setVH();
+  window.addEventListener('resize', setVH, { passive: true });
+  window.addEventListener('orientationchange', () => setTimeout(setVH, 150), { passive: true });
+
   /* ============ LOADER ============ */
   window.addEventListener('load', () => {
-    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 600);
+    setTimeout(() => document.getElementById('loader')?.classList.add('hidden'), 400);
   });
 
   /* ============ YEAR ============ */
   const y = new Date().getFullYear();
   const yearEl = document.getElementById('year');
-  const yearKhEl = document.getElementById('yearKh');
   if (yearEl) yearEl.textContent = y;
-  if (yearKhEl) yearKhEl.textContent = y;
 
   /* ============ THEME ============ */
   const themeBtn = document.getElementById('themeBtn');
   const themeIcon = document.getElementById('themeIcon');
   const html = document.documentElement;
 
+  // Respect system preference on first visit
+  const savedTheme = localStorage.getItem('theme');
+  const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (savedTheme === 'dark' || (!savedTheme && sysDark)) {
+    html.classList.remove('light');
+    html.classList.add('dark');
+  } else {
+    html.classList.remove('dark');
+    html.classList.add('light');
+  }
+
   function syncIcon() {
-    if (html.classList.contains('dark')) {
-      themeIcon.className = 'fa-solid fa-sun';
-    } else {
-      themeIcon.className = 'fa-solid fa-moon';
-    }
+    if (themeIcon) themeIcon.className = html.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
   }
   syncIcon();
 
-  themeBtn.addEventListener('click', () => {
+  themeBtn?.addEventListener('click', () => {
     if (html.classList.contains('dark')) {
       html.classList.remove('dark');
       html.classList.add('light');
@@ -52,32 +83,31 @@
     timeEl.textContent = `${String(pp.getHours()).padStart(2, '0')}:${String(pp.getMinutes()).padStart(2, '0')} · PNH`;
   }
   updateTime();
-  setInterval(updateTime, 30000);
+  setInterval(updateTime, 60000);
 
-  /* ============ CURSOR (dot + ring) ============ */
-  const cursorDot = document.getElementById('cursorDot');
-  const cursorRing = document.getElementById('cursorRing');
-  let mouseX = 0, mouseY = 0;
-  let ringX = 0, ringY = 0;
+  /* ============ CURSOR (DESKTOP ONLY) ============ */
+  if (isDesktop) {
+    const cursorDot = document.getElementById('cursorDot');
+    const cursorRing = document.getElementById('cursorRing');
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
 
-  if (window.matchMedia('(min-width: 1025px)').matches) {
     document.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      cursorDot.style.left = mouseX + 'px';
-      cursorDot.style.top = mouseY + 'px';
-    });
+      cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    }, { passive: true });
 
     function animateRing() {
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-      cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
       requestAnimationFrame(animateRing);
     }
     animateRing();
 
-    document.querySelectorAll('a, button, .project-card, .info-card, .edu-item, .cta-card, .contact-row, .stat-card, .filter-btn, .blog-card, .cmd-item, .tilt-card, .carousel-btn, .carousel-dot, .carousel-cta, .code-tab, .code-action').forEach(el => {
+    const hoverables = document.querySelectorAll('a, button, .project-card, .info-card, .edu-item, .cta-card, .contact-row, .stat-card, .filter-btn, .blog-card, .cmd-item, .carousel-btn, .carousel-dot, .carousel-cta, .code-tab, .code-action');
+    hoverables.forEach(el => {
       el.addEventListener('mouseenter', () => {
         cursorDot.classList.add('hover');
         cursorRing.classList.add('hover');
@@ -96,9 +126,6 @@
       cursorDot.style.opacity = '1';
       cursorRing.classList.remove('hidden');
     });
-  } else {
-    cursorRing.style.display = 'none';
-    cursorDot.style.display = 'none';
   }
 
   /* ============ TYPING ============ */
@@ -108,41 +135,58 @@
 
   function type() {
     if (!typingEl) return;
+    if (isMobile && !prefersReduced) {
+      typingEl.textContent = 'learner';
+      return;
+    }
     const w = words[wI];
     if (!del) {
       typingEl.textContent = w.slice(0, cI + 1);
       cI++;
-      if (cI === w.length) { del = true; setTimeout(type, 1600); return; }
+      if (cI === w.length) { del = true; setTimeout(type, 1800); return; }
     } else {
       typingEl.textContent = w.slice(0, cI - 1);
       cI--;
       if (cI === 0) { del = false; wI = (wI + 1) % words.length; }
     }
-    setTimeout(type, del ? 60 : 110);
+    setTimeout(type, del ? 70 : 130);
   }
   type();
 
-  /* ============ SCROLL PROGRESS + HEADER + SCROLL TOP ============ */
+  /* ============ SCROLL ============ */
   const bar = document.getElementById('scrollProgress');
   const header = document.getElementById('header');
   const scrollTopBtn = document.getElementById('scrollTop');
   const availBanner = document.getElementById('availBanner');
+  let scrollTicking = false;
+
+  function onScroll() {
+    const sy = window.scrollY;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    if (bar) bar.style.width = (sy / h) * 100 + '%';
+    if (header) header.classList.toggle('scrolled', sy > 40);
+    if (scrollTopBtn) scrollTopBtn.classList.toggle('show', sy > 400);
+    if (availBanner) availBanner.classList.toggle('show', sy > 800);
+    setActive();
+    scrollTicking = false;
+  }
 
   window.addEventListener('scroll', () => {
-    const h = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.width = (window.scrollY / h) * 100 + '%';
-    header.classList.toggle('scrolled', window.scrollY > 40);
-    const show = window.scrollY > 400;
-    scrollTopBtn.classList.toggle('show', show);
-    availBanner.classList.toggle('show', window.scrollY > 800);
+    if (!scrollTicking) {
+      scrollTicking = true;
+      requestAnimationFrame(onScroll);
+    }
   }, { passive: true });
 
-  scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  scrollTopBtn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   /* ============ ACTIVE NAV / SECTION DOTS ============ */
   const navLinks = document.querySelectorAll('.nav-link[data-section]');
   const sections = document.querySelectorAll('section[id]');
   const sectionDots = document.querySelectorAll('.section-dot');
+  const indicator = document.getElementById('sectionIndicator');
 
   function setActive() {
     let current = 'hero';
@@ -151,11 +195,8 @@
     });
     navLinks.forEach(l => l.classList.toggle('active', l.dataset.section === current));
     sectionDots.forEach(d => d.classList.toggle('active', d.dataset.section === current));
-    const indicator = document.getElementById('sectionIndicator');
-    indicator.classList.toggle('show', window.scrollY > 300);
+    if (indicator) indicator.classList.toggle('show', window.scrollY > 300);
   }
-  window.addEventListener('scroll', setActive, { passive: true });
-  setActive();
 
   sectionDots.forEach(dot => {
     dot.addEventListener('click', () => {
@@ -169,15 +210,16 @@
   const mobileMenu = document.getElementById('mobileMenu');
   const menuIcon = document.getElementById('menuIcon');
 
-  menuBtn.addEventListener('click', () => {
+  menuBtn?.addEventListener('click', () => {
     const open = !mobileMenu.classList.contains('hidden');
     mobileMenu.classList.toggle('hidden');
-    menuIcon.className = open ? 'fa-solid fa-bars' : 'fa-solid fa-xmark';
+    if (menuIcon) menuIcon.className = open ? 'fa-solid fa-bars' : 'fa-solid fa-xmark';
   });
+
   document.querySelectorAll('.mobile-link').forEach(l => {
     l.addEventListener('click', () => {
-      mobileMenu.classList.add('hidden');
-      menuIcon.className = 'fa-solid fa-bars';
+      mobileMenu?.classList.add('hidden');
+      if (menuIcon) menuIcon.className = 'fa-solid fa-bars';
     });
   });
 
@@ -202,7 +244,7 @@
         skillObs.unobserve(e.target);
       }
     });
-  }, { threshold: 0.4 });
+  }, { threshold: 0.3 });
   document.querySelectorAll('.skill-fill').forEach(el => skillObs.observe(el));
 
   /* ============ COUNTERS ============ */
@@ -212,11 +254,11 @@
         const el = e.target;
         const target = parseInt(el.dataset.count, 10);
         const suffix = el.dataset.suffix || '';
-        const dur = 1400;
+        const dur = 1200;
         const start = performance.now();
         function tick(t) {
           const p = Math.min((t - start) / dur, 1);
-          const eased = 1 - Math.pow(1 - p, 4);
+          const eased = 1 - Math.pow(1 - p, 3);
           el.textContent = Math.round(eased * target) + suffix;
           if (p < 1) requestAnimationFrame(tick);
           else el.textContent = target + suffix;
@@ -225,7 +267,7 @@
         counterObs.unobserve(el);
       }
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.4 });
   document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
 
   /* ============ FILTER ============ */
@@ -248,7 +290,8 @@
   const toastText = document.getElementById('toastText');
 
   function showToast(msg) {
-    toastText.textContent = msg;
+    if (!toast) return;
+    if (toastText) toastText.textContent = msg;
     toast.classList.add('show');
     clearTimeout(toast._t);
     toast._t = setTimeout(() => toast.classList.remove('show'), 2000);
@@ -259,33 +302,31 @@
       e.preventDefault();
       e.stopPropagation();
       const text = btn.dataset.copy;
+      if (!text) return;
       navigator.clipboard.writeText(text).then(() => {
         btn.classList.add('copied');
         const icon = btn.querySelector('i');
-        const orig = icon.className;
-        icon.className = 'fa-solid fa-check';
-        showToast('Copied: ' + text);
+        const orig = icon?.className;
+        if (icon) icon.className = 'fa-solid fa-check';
+        showToast('Copied!');
         setTimeout(() => {
           btn.classList.remove('copied');
-          icon.className = orig;
-        }, 2000);
-      });
+          if (icon && orig) icon.className = orig;
+        }, 1800);
+      }).catch(() => showToast('Copy failed'));
     });
   });
 
-  /* ============ PROJECT MODAL ============ */
-  const modalBackdrop = document.getElementById('modalBackdrop');
-  const modalContent = document.getElementById('modalContent');
-
+  /* ============ PROJECT DATA ============ */
   const projectData = {
     todo: {
       number: 'PROJECT · 001',
       title: 'To-Do List',
       titleKh: 'បញ្ជីការងារត្រូវធ្វើ',
-      desc: 'A simple, focused task manager. Add, check off, and delete tasks — all saved in your browser with localStorage so nothing is lost on refresh.',
-      descKh: 'កម្មវិធីគ្រប់គ្រងការងារដ៏សាមញ្ញ។ បន្ថែម ធីក និងលុបការងារ — រក្សាទុកក្នុងកម្មវិធីរុករកដោយ localStorage។',
-      features: ['Add, edit, complete, delete tasks', 'Persists across reloads via localStorage', 'Responsive layout, keyboard-accessible'],
-      featuresKh: ['បន្ថែម កែ បញ្ចប់ និងលុបការងារ', 'រក្សាទុកឆ្លងកាត់ការផ្ទុកទំព័រឡើងវិញ', 'ឆ្លើយតប និងអាចប្រើក្តារចុចបាន'],
+      desc: 'A simple, focused task manager. Add, check off, and delete tasks — all saved in your browser with localStorage.',
+      descKh: 'កម្មវិធីគ្រប់គ្រងការងារដ៏សាមញ្ញ។',
+      features: ['Add, edit, complete, delete tasks', 'Persists via localStorage', 'Keyboard-accessible'],
+      featuresKh: ['បន្ថែម កែ បញ្ចប់ លុបការងារ', 'រក្សាទុកដោយ localStorage', 'អាចប្រើក្តារចុចបាន'],
       tags: ['HTML', 'CSS', 'JavaScript', 'localStorage'],
       icon: 'fa-solid fa-list-check',
       url: 'todo.app'
@@ -294,10 +335,10 @@
       number: 'PROJECT · 002',
       title: 'Calculator',
       titleKh: 'ម៉ាស៊ីនគិតលេខ',
-      desc: 'My first UI project. Handles basic arithmetic with a clean layout, keyboard support, and careful edge-case handling for divide-by-zero and decimals.',
-      descKh: 'គម្រោង UI ដំបូងរបស់ខ្ញុំ។ ដោះស្រាយគណិតវិទ្យាមូលដ្ឋាន ជាមួយប្លង់ស្អាត និងការគាំទ្រក្តារចុច។',
-      features: ['Basic operations: + − × ÷', 'Keyboard input support', 'Handles divide-by-zero and decimals'],
-      featuresKh: ['ប្រតិបត្តិការមូលដ្ឋាន៖ + − × ÷', 'គាំទ្រការបញ្ចូលដោយក្តារចុច', 'ដោះស្រាយការចែកនឹងសូន្យ'],
+      desc: 'My first UI project. Handles basic arithmetic with clean layout, keyboard support, and careful edge-case handling.',
+      descKh: 'គម្រោង UI ដំបូងរបស់ខ្ញុំ។',
+      features: ['Basic operations: + − × ÷', 'Keyboard input support', 'Handles divide-by-zero'],
+      featuresKh: ['ប្រតិបត្តិការមូលដ្ឋាន', 'គាំទ្រក្តារចុច', 'ដោះស្រាយការចែកនឹងសូន្យ'],
       tags: ['HTML', 'CSS', 'JavaScript'],
       icon: 'fa-solid fa-calculator',
       url: 'calc.app'
@@ -306,29 +347,30 @@
       number: 'PROJECT · 003',
       title: 'Weather App',
       titleKh: 'កម្មវិធីអាកាសធាតុ',
-      desc: 'Search any city and see the current weather. My first project calling a real API with fetch and async/await, plus error handling for bad input.',
-      descKh: 'ស្វែងរកទីក្រុងណាមួយ និងមើលអាកាសធាតុបច្ចុប្បន្ន។ គម្រោងដំបូងដែលហៅ API ពិតប្រាកដដោយ fetch និង async/await។',
-      features: ['Live weather from OpenWeather API', 'Async/await with loading states', 'Graceful errors for unknown cities'],
-      featuresKh: ['អាកាសធាតុផ្ទាល់ពី OpenWeather API', 'ប្រើ async/await ជាមួយស្ថានភាពផ្ទុក', 'ដោះស្រាយកំហុសសម្រាប់ទីក្រុងដែលមិនស្គាល់'],
+      desc: 'Search any city and see current weather. First project calling a real API with fetch and async/await.',
+      descKh: 'ស្វែងរកទីក្រុង និងមើលអាកាសធាតុបច្ចុប្បន្ន។',
+      features: ['Live weather from OpenWeather API', 'Async/await with loading states', 'Graceful errors'],
+      featuresKh: ['អាកាសធាតុផ្ទាល់ពី API', 'ប្រើ async/await', 'ដោះស្រាយកំហុស'],
       tags: ['JavaScript', 'Fetch API', 'Async/Await', 'CSS'],
       icon: 'fa-solid fa-cloud-sun',
       url: 'weather.app'
     }
   };
 
+  /* ============ MODAL ============ */
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const modalContent = document.getElementById('modalContent');
+
   function openModal(id) {
     const d = projectData[id];
-    if (!d) return;
+    if (!d || !modalContent) return;
     modalContent.innerHTML = `
-      <button class="modal-close" id="modalCloseBtn" aria-label="Close"
-              style="position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#f1f5f9;border:1px solid rgba(249,115,22,.15);color:#1e293b;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;transition:.25s">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
       <div class="project-num">${d.number}</div>
       <h3 class="font-display text-2xl font-extrabold mt-1 mb-1">${d.title}</h3>
       <p class="khmer text-ink-500 dark:text-ink-400 font-medium mb-5">${d.titleKh}</p>
-      <div class="rounded-2xl p-6 mb-6" style="background:linear-gradient(145deg,rgba(249,115,22,.12),rgba(236,72,153,.06))">
-        <div class="mock-window mx-auto max-w-xs">
+      <div class="rounded-2xl p-5 mb-5" style="background:linear-gradient(145deg,rgba(249,115,22,.12),rgba(236,72,153,.06))">
+        <div class="mock-window mx-auto" style="max-width:280px">
           <div class="mock-bar"><span class="mock-dot red"></span><span class="mock-dot yellow"></span><span class="mock-dot green"></span><span class="mock-url">${d.url}</span></div>
           <div class="mock-body">
             <div class="mock-line w-60"></div>
@@ -338,33 +380,33 @@
           </div>
         </div>
       </div>
-      <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-ink-400 mb-2">Overview · ទិដ្ឋភាពទូទៅ</div>
+      <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-ink-400 mb-2">Overview</div>
       <p class="text-sm text-ink-600 dark:text-ink-300 mb-2 leading-relaxed">${d.desc}</p>
-      <p class="khmer text-[14px] text-ink-500 dark:text-ink-400 leading-relaxed mb-5">${d.descKh}</p>
+      <p class="khmer text-[13px] text-ink-500 dark:text-ink-400 leading-relaxed mb-5">${d.descKh}</p>
       <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-ink-400 mb-2">Key features</div>
       <ul class="flex flex-col gap-2 mb-5">
         ${d.features.map((f, i) => `
           <li class="flex gap-2.5 text-sm">
-            <i class="fa-solid fa-circle-check text-brand-500 mt-1"></i>
+            <i class="fa-solid fa-circle-check text-brand-500 mt-1 flex-shrink-0"></i>
             <div>
               <div>${f}</div>
-              <div class="khmer text-[12.5px] text-ink-500 dark:text-ink-400 mt-0.5">${d.featuresKh[i]}</div>
+              <div class="khmer text-[12px] text-ink-500 dark:text-ink-400 mt-0.5">${d.featuresKh[i]}</div>
             </div>
           </li>
         `).join('')}
       </ul>
       <div class="font-mono text-[11px] font-bold tracking-widest uppercase text-ink-400 mb-2">Tech stack</div>
-      <div class="flex flex-wrap gap-1.5 mb-6">
+      <div class="flex flex-wrap gap-1.5 mb-5">
         ${d.tags.map(t => `<span class="font-mono text-[11px] px-2.5 py-1 rounded bg-brand-500/10 text-brand-500 font-semibold">${t}</span>`).join('')}
       </div>
-      <div class="flex gap-2.5 pt-5 border-t border-ink-200/60 dark:border-ink-800">
-        <a href="#" class="btn-primary">Live demo <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-        <a href="#" class="btn-ghost">Source <i class="fa-brands fa-github"></i></a>
+      <div class="flex gap-2.5 pt-4 border-t border-ink-200/60 dark:border-ink-800">
+        <a href="#" class="btn-primary">Live demo</a>
+        <a href="#" class="btn-ghost">Source</a>
       </div>
     `;
     modalBackdrop.classList.add('open');
     document.body.style.overflow = 'hidden';
-    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+    document.getElementById('modalCloseBtn')?.addEventListener('click', closeModal);
   }
 
   function closeModal() {
@@ -373,12 +415,9 @@
   }
 
   projectCards.forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.project-link')) e.preventDefault();
-      openModal(card.dataset.project);
-    });
+    card.addEventListener('click', () => openModal(card.dataset.project));
   });
-  modalBackdrop.addEventListener('click', (e) => {
+  modalBackdrop?.addEventListener('click', (e) => {
     if (e.target === modalBackdrop) closeModal();
   });
 
@@ -391,13 +430,13 @@
   const progress = document.getElementById('carouselProgress');
   let current = 0;
   let autoTimer = null;
-  const AUTO_DELAY = 6000;
+  const AUTO_DELAY = 7000;
 
   if (slides.length && dotsWrap) {
     slides.forEach((_, i) => {
       const d = document.createElement('button');
       d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      d.setAttribute('aria-label', 'Slide ' + (i + 1));
       d.addEventListener('click', () => goTo(i));
       dotsWrap.appendChild(d);
     });
@@ -408,7 +447,7 @@
       if (i < 0) i = slides.length - 1;
       if (i >= slides.length) i = 0;
       current = i;
-      track.style.transform = `translateX(-${current * 100}%)`;
+      track.style.transform = `translate3d(-${current * 100}%, 0, 0)`;
       dots.forEach((d, k) => d.classList.toggle('active', k === current));
       if (progress) progress.style.width = ((current + 1) / slides.length * 100) + '%';
       resetAuto();
@@ -416,22 +455,29 @@
     function next() { goTo(current + 1); }
     function prev() { goTo(current - 1); }
 
-    prevBtn.addEventListener('click', prev);
-    nextBtn.addEventListener('click', next);
+    prevBtn?.addEventListener('click', prev);
+    nextBtn?.addEventListener('click', next);
 
-    function startAuto() { autoTimer = setInterval(next, AUTO_DELAY); }
-    function resetAuto() { clearInterval(autoTimer); startAuto(); }
+    function startAuto() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(next, AUTO_DELAY);
+    }
+    function resetAuto() { startAuto(); }
 
     const vp = document.getElementById('carouselViewport');
-    vp.addEventListener('mouseenter', () => clearInterval(autoTimer));
-    vp.addEventListener('mouseleave', startAuto);
+    vp?.addEventListener('mouseenter', () => clearInterval(autoTimer));
+    vp?.addEventListener('mouseleave', startAuto);
 
     let tx = 0, ex = 0;
-    vp.addEventListener('touchstart', e => tx = e.changedTouches[0].screenX, { passive: true });
-    vp.addEventListener('touchend', e => {
+    vp?.addEventListener('touchstart', e => {
+      tx = e.changedTouches[0].screenX;
+      clearInterval(autoTimer);
+    }, { passive: true });
+    vp?.addEventListener('touchend', e => {
       ex = e.changedTouches[0].screenX;
       const diff = tx - ex;
       if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
+      startAuto();
     }, { passive: true });
 
     startAuto();
@@ -449,10 +495,8 @@
     'todo-js': {
       filename: 'todo.js',
       lang: 'js',
-      content: `// ==============================
-//  To-Do List · localStorage
-//  Author: Minsopanha · RUPP
-// ==============================
+      content: `// To-Do List · localStorage
+// Author: Minsopanha · RUPP
 
 const STORAGE_KEY = 'minsopanha_todos';
 let todos = load();
@@ -476,16 +520,14 @@ function render() {
       <input type="checkbox" \${t.done ? 'checked' : ''}
              onchange="toggle(\${i})">
       <span>\${escapeHtml(t.text)}</span>
-      <button onclick="remove(\${i})" aria-label="Delete">
-        <i class="fa-solid fa-trash"></i>
-      </button>
+      <button onclick="remove(\${i})">×</button>
     </li>
   \`).join('');
 }
 
 function add(text) {
   if (!text.trim()) return;
-  todos.unshift({ text: text.trim(), done: false, ts: Date.now() });
+  todos.unshift({ text: text.trim(), done: false });
   save();
   render();
 }
@@ -509,23 +551,13 @@ function escapeHtml(str) {
   }[c]));
 }
 
-// Init
-render();
-document.getElementById('todo-form')
-  .addEventListener('submit', (e) => {
-    e.preventDefault();
-    const input = document.getElementById('todo-input');
-    add(input.value);
-    input.value = '';
-  });`
+render();`
     },
     'calc-js': {
       filename: 'calc.js',
       lang: 'js',
-      content: `// ==============================
-//  Calculator · Keyboard support
-//  Author: Minsopanha · RUPP
-// ==============================
+      content: `// Calculator · Keyboard support
+// Author: Minsopanha · RUPP
 
 const display = document.getElementById('display');
 let buffer = '0';
@@ -594,7 +626,6 @@ function clear() {
   updateDisplay();
 }
 
-// Keyboard
 document.addEventListener('keydown', (e) => {
   if (/[0-9.]/.test(e.key)) input(e.key);
   else if (e.key === '+') chooseOperator('+');
@@ -603,10 +634,6 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === '/') { e.preventDefault(); chooseOperator('÷'); }
   else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); compute(); }
   else if (e.key === 'Escape') clear();
-  else if (e.key === 'Backspace') {
-    buffer = buffer.slice(0, -1) || '0';
-    updateDisplay();
-  }
 });
 
 updateDisplay();`
@@ -614,10 +641,8 @@ updateDisplay();`
     'weather-js': {
       filename: 'weather.js',
       lang: 'js',
-      content: `// ==============================
-//  Weather App · fetch + async/await
-//  Author: Minsopanha · RUPP
-// ==============================
+      content: `// Weather App · fetch + async/await
+// Author: Minsopanha · RUPP
 
 const API_KEY = 'demo_key_replace_me';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
@@ -666,16 +691,13 @@ form.addEventListener('submit', (e) => {
   if (city) getWeather(city);
 });
 
-// Load a default city on first visit
 getWeather('Phnom Penh');`
     },
     'styles-css': {
       filename: 'styles.css',
       lang: 'css',
-      content: `/* ==============================
-   Custom styles — shared
-   Author: Minsopanha · RUPP
-   ============================== */
+      content: `/* Custom styles — shared
+   Author: Minsopanha · RUPP */
 
 :root {
   --brand: #f97316;
@@ -684,7 +706,6 @@ getWeather('Phnom Penh');`
   --gradient: linear-gradient(135deg, #f97316, #ec4899, #06b6d4);
 }
 
-/* Animated gradient text */
 .gradient-text {
   background: var(--gradient);
   background-size: 300% 300%;
@@ -699,7 +720,6 @@ getWeather('Phnom Penh');`
   50%      { background-position: 100% 50%; }
 }
 
-/* Card with animated underline */
 .card {
   position: relative;
   background: #fff;
@@ -726,26 +746,7 @@ getWeather('Phnom Penh');`
   box-shadow: 0 24px 48px -16px rgba(249,115,22,.35);
 }
 
-.card:hover::after { transform: scaleX(1); }
-
-/* Custom cursor */
-.cursor-dot {
-  position: fixed;
-  width: 10px; height: 10px;
-  background: var(--brand);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: width .2s, height .2s, background .2s;
-  box-shadow: 0 0 12px var(--brand);
-}
-
-.cursor-dot.hover {
-  width: 28px; height: 28px;
-  background: var(--pink);
-  box-shadow: 0 0 24px var(--pink);
-}`
+.card:hover::after { transform: scaleX(1); }`
     }
   };
 
@@ -762,20 +763,13 @@ getWeather('Phnom Penh');`
     }[c]));
   }
 
-  // Simple syntax highlighter (JS / CSS)
   function highlight(code, lang) {
     let html = escapeHtml(code);
-
     if (lang === 'js') {
-      // comments
       html = html.replace(/(\/\/[^\n]*)/g, '<span class="tok-comment">$1</span>');
-      // strings (single, double, backtick)
       html = html.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|`[^`]*?`)/g, '<span class="tok-string">$1</span>');
-      // keywords
-      html = html.replace(/\b(const|let|var|function|return|if|else|for|while|switch|case|break|continue|new|try|catch|finally|throw|async|await|class|extends|import|from|export|default|null|undefined|true|false|this|typeof|instanceof|delete|in|of)\b/g, '<span class="tok-keyword">$1</span>');
-      // numbers
+      html = html.replace(/\b(const|let|var|function|return|if|else|for|while|switch|case|break|continue|new|try|catch|finally|throw|async|await|class|extends|import|from|export|default|null|undefined|true|false|this|typeof)\b/g, '<span class="tok-keyword">$1</span>');
       html = html.replace(/\b(\d+(\.\d+)?)\b/g, '<span class="tok-number">$1</span>');
-      // functions
       html = html.replace(/\b([a-zA-Z_$][\w$]*)\s*(?=\()/g, '<span class="tok-func">$1</span>');
     } else if (lang === 'css') {
       html = html.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="tok-comment">$1</span>');
@@ -783,8 +777,6 @@ getWeather('Phnom Penh');`
       html = html.replace(/\b(\d+(\.\d+)?(px|em|rem|%|vh|vw|s|ms)?)\b/g, '<span class="tok-number">$1</span>');
       html = html.replace(/(--[\w-]+)/g, '<span class="tok-func">$1</span>');
     }
-
-    // Build lines
     const lines = html.split('\n');
     return lines.map((line, i) =>
       `<div class="code-line"><span class="code-line-num">${i + 1}</span><span class="code-line-content">${line || ' '}</span></div>`
@@ -793,10 +785,10 @@ getWeather('Phnom Penh');`
 
   function renderCode(fileKey) {
     const file = codeFiles[fileKey];
-    if (!file) return;
+    if (!file || !codeBlock) return;
     currentCodeFile = fileKey;
-    codeFilename.textContent = file.filename;
-    codeBlock.innerHTML = `<code class="code-content">${highlight(file.content, file.lang)}</code>`;
+    if (codeFilename) codeFilename.textContent = file.filename;
+    codeBlock.innerHTML = `<code>${highlight(file.content, file.lang)}</code>`;
   }
 
   codeTabs.forEach(tab => {
@@ -807,9 +799,7 @@ getWeather('Phnom Penh');`
     });
   });
 
-  if (codeTabs.length) {
-    renderCode('todo-js');
-  }
+  if (codeTabs.length) renderCode('todo-js');
 
   codeCopyBtn?.addEventListener('click', () => {
     const code = codeFiles[currentCodeFile]?.content || '';
@@ -826,12 +816,12 @@ getWeather('Phnom Penh');`
   let visItems = Array.from(cmdItems);
 
   function openCmd() {
-    cmdBackdrop.classList.add('open');
-    cmdInput.value = '';
+    cmdBackdrop?.classList.add('open');
+    if (cmdInput) cmdInput.value = '';
     filterCmd('');
-    setTimeout(() => cmdInput.focus(), 50);
+    setTimeout(() => cmdInput?.focus(), 50);
   }
-  function closeCmd() { cmdBackdrop.classList.remove('open'); }
+  function closeCmd() { cmdBackdrop?.classList.remove('open'); }
 
   function filterCmd(q) {
     const query = q.trim().toLowerCase();
@@ -854,11 +844,13 @@ getWeather('Phnom Penh');`
     if (a === 'goto') {
       document.querySelector(item.dataset.target)?.scrollIntoView({ behavior: 'smooth' });
     } else if (a === 'toggle-theme') {
-      themeBtn.click();
+      themeBtn?.click();
     } else if (a === 'copy-email') {
       navigator.clipboard.writeText('Minsopanha@gmail.com').then(() => showToast('Copied: Minsopanha@gmail.com'));
     } else if (a === 'open-telegram') {
       window.open('https://t.me/minsopanha', '_blank');
+    } else if (a === 'open-dashboard') {
+      window.location.href = 'dashboard.html';
     } else if (a === 'scroll-top') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -890,30 +882,32 @@ getWeather('Phnom Penh');`
       updateSel();
     });
   });
-  cmdBackdrop.addEventListener('click', e => {
+  cmdBackdrop?.addEventListener('click', e => {
     if (e.target === cmdBackdrop) closeCmd();
   });
 
-  /* ============ GLOBAL SHORTCUTS ============ */
-  document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      openCmd();
-    }
-    if (e.key === 'Escape') {
-      if (modalBackdrop.classList.contains('open')) closeModal();
-    }
-    if (cmdBackdrop.classList.contains('open')) return;
-    const tag = document.activeElement.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
+  /* ============ GLOBAL SHORTCUTS (desktop only) ============ */
+  if (isDesktop) {
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openCmd();
+      }
+      if (e.key === 'Escape') {
+        if (modalBackdrop?.classList.contains('open')) closeModal();
+      }
+      if (cmdBackdrop?.classList.contains('open')) return;
+      const tag = document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-    const map = { p: '#work', c: '#code', a: '#about', b: '#blog', e: '#education', s: '#skills', g: '#guestbook' };
-    if (map[e.key.toLowerCase()]) {
-      document.querySelector(map[e.key.toLowerCase()])?.scrollIntoView({ behavior: 'smooth' });
-    }
-    if (e.key.toLowerCase() === 't') themeBtn.click();
-  });
+      const map = { p: '#work', c: '#code', a: '#about', b: '#blog', e: '#education', s: '#skills', g: '#guestbook' };
+      if (map[e.key.toLowerCase()]) {
+        document.querySelector(map[e.key.toLowerCase()])?.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (e.key.toLowerCase() === 't') themeBtn?.click();
+    });
+  }
 
   /* ============ GUESTBOOK ============ */
   const gbForm = document.getElementById('guestbookForm');
@@ -942,7 +936,7 @@ getWeather('Phnom Penh');`
   function fmtTime(ts) {
     const diff = Date.now() - ts;
     const m = Math.floor(diff / 60000);
-    if (m < 1) return 'just now · ទើបនេះ';
+    if (m < 1) return 'just now';
     if (m < 60) return m + 'm ago';
     const h = Math.floor(m / 60);
     if (h < 24) return h + 'h ago';
@@ -957,6 +951,7 @@ getWeather('Phnom Penh');`
   }
   function renderGB() {
     const entries = loadGB();
+    if (!gbList) return;
     if (!entries.length) {
       gbList.innerHTML = `<div class="text-center text-ink-400 font-mono text-xs py-6">No entries yet · មិនទាន់មានធាតុ</div>`;
       return;
@@ -965,8 +960,8 @@ getWeather('Phnom Penh');`
       const color = avatarColors[i % avatarColors.length];
       const init = (e.name || '?').charAt(0).toUpperCase();
       return `
-        <div class="guestbook-entry flex gap-3.5 p-4 rounded-2xl bg-white/70 dark:bg-ink-800/50 backdrop-blur border border-brand-500/10 dark:border-pink-500/15 transition-all hover:translate-x-1.5 hover:border-brand-500/40" style="animation:slideIn .5s cubic-bezier(.34,1.56,.64,1)">
-          <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-extrabold text-sm flex-shrink-0" style="background:${color}">${init}</div>
+        <div class="guestbook-entry">
+          <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0;background:${color}">${init}</div>
           <div class="flex-1 min-w-0">
             <div class="flex items-baseline gap-2.5 flex-wrap mb-1">
               <span class="font-bold text-sm">${esc(e.name)}</span>
@@ -979,7 +974,7 @@ getWeather('Phnom Penh');`
   }
 
   gbMessage?.addEventListener('input', () => {
-    gbCount.textContent = gbMessage.value.length + ' / 280';
+    if (gbCount) gbCount.textContent = gbMessage.value.length + ' / 280';
   });
   gbForm?.addEventListener('submit', e => {
     e.preventDefault();
@@ -990,45 +985,30 @@ getWeather('Phnom Penh');`
     arr.unshift({ name, message: msg, ts: Date.now() });
     saveGB(arr);
     gbForm.reset();
-    gbCount.textContent = '0 / 280';
+    if (gbCount) gbCount.textContent = '0 / 280';
     renderGB();
     showToast('Thanks for signing! · អរគុណ!');
   });
   renderGB();
 
-  /* ============ TILT CARDS ============ */
-  document.querySelectorAll('.tilt-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-      const cx = r.width / 2;
-      const cy = r.height / 2;
-      const rx = (y - cy) / cy * -5;
-      const ry = (x - cx) / cx * 5;
-      card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+  /* ============ TILT CARDS (DESKTOP ONLY) ============ */
+  if (isDesktop && !prefersReduced) {
+    document.querySelectorAll('.tilt-card, .project-card, .stat-card, .info-card, .blog-card, .edu-item').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        const cx = r.width / 2;
+        const cy = r.height / 2;
+        const rx = (y - cy) / cy * -4;
+        const ry = (x - cx) / cx * 4;
+        card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-3px)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
     });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-    });
-  });
-
-  /* ============ RIPPLE ON CLICK ============ */
-  document.querySelectorAll('.btn-primary, .btn-ghost, .filter-btn, .cta-card, .project-card, .info-card, .edu-item, .blog-card, .carousel-btn, .carousel-cta, .code-tab').forEach(el => {
-    el.addEventListener('click', function (e) {
-      const r = this.getBoundingClientRect();
-      const rip = document.createElement('span');
-      rip.className = 'ripple';
-      const size = Math.max(r.width, r.height);
-      rip.style.width = rip.style.height = size + 'px';
-      rip.style.left = (e.clientX - r.left - size / 2) + 'px';
-      rip.style.top = (e.clientY - r.top - size / 2) + 'px';
-      this.style.position = 'relative';
-      this.style.overflow = 'hidden';
-      this.appendChild(rip);
-      setTimeout(() => rip.remove(), 700);
-    });
-  });
+  }
 
   /* ============ SCROLL REVEAL ============ */
   const revealObs = new IntersectionObserver((entries) => {
@@ -1038,24 +1018,7 @@ getWeather('Phnom Penh');`
         revealObs.unobserve(en.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
   document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
-
-  /* ============ HERO GLOW FOLLOW ============ */
-  const heroAvatar = document.querySelector('.hero-avatar');
-  if (heroAvatar) {
-    heroAvatar.addEventListener('mousemove', e => {
-      const r = heroAvatar.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width) * 100;
-      const y = ((e.clientY - r.top) / r.height) * 100;
-      heroAvatar.style.boxShadow = `
-        0 24px 48px -16px rgba(249,115,22,.5),
-        ${(x - 50) * 0.5}px ${(y - 50) * 0.5}px 60px -10px rgba(236,72,153,.6)
-      `;
-    });
-    heroAvatar.addEventListener('mouseleave', () => {
-      heroAvatar.style.boxShadow = '0 24px 48px -16px rgba(249,115,22,.5)';
-    });
-  }
 
 })();
